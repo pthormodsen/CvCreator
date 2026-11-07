@@ -20,3 +20,11 @@ export function save(key: string, value: string): boolean {
     return false
   }
 }
+
+export function remove(key: string) {
+  try {
+    localStorage.removeItem(PREFIX + key)
+  } catch {
+    // Ingenting å gjøre
+  }
+}

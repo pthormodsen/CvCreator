@@ -208,6 +208,20 @@ body {
 
 .editor-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
+/* Problemer i innstillingene (front matter) */
+.settings-warnings {
+  display: flex;
+  gap: 8px;
+  padding: 8px 24px;
+  background: #fff8c5;
+  border-bottom: 1px solid #eac54f;
+  color: #6a4b00;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.settings-warnings svg { flex-shrink: 0; margin-top: 2px; }
+.settings-warnings ul { margin: 0; padding: 0; list-style: none; }
+
 /* CodeMirror-editoren fyller resten av panelet. Utseendet ellers står i MarkdownEditor.tsx. */
 .editor-host { flex: 1; min-height: 0; }
 

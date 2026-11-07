@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react'
-import { EditorState } from '@codemirror/state'
-import { EditorView, keymap, placeholder } from '@codemirror/view'
+import { EditorState, RangeSetBuilder, StateField, type Text } from '@codemirror/state'
+import { Decoration, EditorView, keymap, placeholder, type DecorationSet } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { HighlightStyle, LanguageSupport, syntaxHighlighting } from '@codemirror/language'
 import { commonmarkLanguage } from '@codemirror/lang-markdown'
 import { tags } from '@lezer/highlight'
+import { splitFrontMatter } from '../settings'
 
 // Fargene for markdown. lang-markdown gir hver del av teksten en "tag",
 // og her bestemmer vi hvordan hver tag ser ut.
@@ -22,6 +23,27 @@ const markdownHighlight = HighlightStyle.define([
   { tag: tags.monospace, color: '#953800' },
 ])
 
+// Front matter (innstillingene mellom --- øverst) vises dempet, så den ikke konkurrerer
+// med CV-teksten. Vi markerer linjene med klassen cm-frontmatter (se editorTheme under).
+const frontMatterLine = Decoration.line({ class: 'cm-frontmatter' })
+
+function frontMatterDecorations(doc: Text): DecorationSet {
+  const builder = new RangeSetBuilder<Decoration>()
+  const { frontMatter, body } = splitFrontMatter(doc.toString())
+  if (frontMatter !== null) {
+    const end = doc.length - body.length // der front matter slutter
+    const lastLine = doc.lineAt(Math.max(0, end - 1)).number
+    for (let n = 1; n <= lastLine; n++) builder.add(doc.line(n).from, doc.line(n).from, frontMatterLine)
+  }
+  return builder.finish()
+}
+
+const frontMatterField = StateField.define<DecorationSet>({
+  create: (state) => frontMatterDecorations(state.doc),
+  update: (decorations, tr) => (tr.docChanged ? frontMatterDecorations(tr.state.doc) : decorations),
+  provide: (field) => EditorView.decorations.from(field),
+})
+
 // Utseendet på editoren: samme skrift, linjehøyde og luft som textarea-en hadde
 const editorTheme = EditorView.theme({
   '&': { height: '100%', fontSize: '14px', backgroundColor: '#fafbfc', color: '#1f2328' },
@@ -34,6 +56,9 @@ const editorTheme = EditorView.theme({
   // --editor-gutter settes i index.css, så luften kan være mindre på mobil
   '.cm-line': { padding: '0 var(--editor-gutter, 24px)' },
   '.cm-placeholder': { color: '#8c959f' },
+  // Dempet front matter: grå og uten fet/farget markdown-utheving inni
+  '.cm-frontmatter, .cm-frontmatter *': { color: '#8c959f !important', fontWeight: '400 !important' },
+  '.cm-frontmatter': { backgroundColor: '#f2f4f6' },
 })
 
 type MarkdownEditorProps = {
@@ -71,6 +96,7 @@ export function MarkdownEditor({ value, onChange, labelledBy }: MarkdownEditorPr
           //   så de fikk URL-fargen i stedet for lenkefargen
           new LanguageSupport(commonmarkLanguage),
           syntaxHighlighting(markdownHighlight),
+          frontMatterField,
           editorTheme,
           EditorView.lineWrapping,
           placeholder('Write your CV in Markdown…'),

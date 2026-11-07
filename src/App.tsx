@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { Eye, Pencil } from 'lucide-react'
 import { Editor } from './components/Editor'
 import { Preview } from './components/Preview'
@@ -6,15 +6,34 @@ import { Toolbar } from './components/Toolbar'
 import { SplitDivider } from './components/SplitDivider'
 import { clampSplit, DEFAULT_SPLIT } from './split'
 import { findTheme } from './themes'
-import { load, save } from './storage'
+import { load, remove, save } from './storage'
+import { parseCv, updateFrontMatter } from './settings'
 import defaultCv from './defaultCv.md?raw'
+
+// Startteksten. Tidligere lå valgt theme i localStorage. Nå står det i front matter
+// (theme: modern), så det følger med filen. Et gammelt valg flyttes over én gang.
+// Dette kjører én gang når filen lastes, ikke inni React (StrictMode kjører ting to ganger).
+function loadInitialMarkdown(): string {
+  let markdown = load('markdown', defaultCv)
+  const legacyTheme = load('theme', '')
+  if (legacyTheme) {
+    if (legacyTheme !== 'classic' && !parseCv(markdown).settings.theme) {
+      markdown = updateFrontMatter(markdown, ['theme'], legacyTheme)
+      save('markdown', markdown)
+    }
+    remove('theme')
+  }
+  return markdown
+}
+const initialMarkdown = loadInitialMarkdown()
 
 export default function App() {
   // All tilstand bor her og sendes ned som props. Ingen state-bibliotek trengs.
-  // Funksjonen i useState kjøres bare første gang, så vi leser localStorage én gang.
-  const [markdown, setMarkdown] = useState(() => load('markdown', defaultCv))
-  const [themeId, setThemeId] = useState(() => findTheme(load('theme', 'classic')).id)
+  const [markdown, setMarkdown] = useState(initialMarkdown)
   const [saved, setSaved] = useState(true)
+  // Innstillingene leses fra front matter hver gang teksten endres
+  const cv = useMemo(() => parseCv(markdown), [markdown])
+  const theme = findTheme(cv.settings.theme ?? 'classic')
   // Hvilken fane som vises på smal skjerm. På bred skjerm vises begge panelene.
   const [tab, setTab] = useState<'write' | 'preview'>('write')
   // Hvor stor andel av bredden editoren får (0.4 = 40 %). Lagres når brukeren slipper skillelinjen.
@@ -25,16 +44,16 @@ export default function App() {
     save('split', String(ratio))
   }
 
-  // All endring av tekst og theme går gjennom disse to, som også lagrer
-  // og husker om lagringen lyktes (vises som «Lagret» i verktøylinjen).
+  // All endring av teksten går gjennom denne, som også lagrer og husker
+  // om lagringen lyktes (vises som «Saved in browser» i verktøylinjen).
   function updateMarkdown(text: string) {
     setMarkdown(text)
     setSaved(save('markdown', text))
   }
 
+  // Theme lagres i front matter. Classic er standard, så da fjernes nøkkelen.
   function updateTheme(id: string) {
-    setThemeId(id)
-    setSaved(save('theme', id))
+    updateMarkdown(updateFrontMatter(markdown, ['theme'], id === 'classic' ? undefined : id))
   }
 
   // Spør før vi erstatter tekst brukeren har skrevet selv
@@ -59,11 +78,14 @@ export default function App() {
     }
   }
 
+  // Filnavn: filename i front matter, ellers «CV - Navn» fra første #-linje
+  const name = cv.body.match(/^#\s+(.+)$/m)?.[1].trim()
+  const filename = cv.settings.filename ?? (name ? `CV - ${name}` : 'CV')
+
   function handlePrint() {
     // Nettleseren foreslår document.title som filnavn for PDF-en
-    const name = markdown.match(/^#\s+(.+)$/m)?.[1].trim()
     const previousTitle = document.title
-    if (name) document.title = `CV - ${name}`
+    document.title = filename
     window.print()
     document.title = previousTitle
   }
@@ -72,7 +94,8 @@ export default function App() {
     <div className="app">
       <Toolbar
         markdown={markdown}
-        themeId={themeId}
+        filename={filename}
+        themeId={theme.id}
         saved={saved}
         onThemeChange={updateTheme}
         onUpload={handleUpload}
@@ -92,9 +115,9 @@ export default function App() {
       </nav>
       {/* --split styrer kolonnebredden i CSS, så mobil-layouten fortsatt kan overstyre den */}
       <main className="split" style={{ '--split': `${split * 100}%` } as CSSProperties}>
-        <Editor value={markdown} onChange={updateMarkdown} inactive={tab !== 'write'} />
+        <Editor value={markdown} onChange={updateMarkdown} warnings={cv.warnings} inactive={tab !== 'write'} />
         <SplitDivider ratio={split} onChange={setSplit} onCommit={commitSplit} />
-        <Preview markdown={markdown} theme={findTheme(themeId)} inactive={tab !== 'preview'} />
+        <Preview markdown={markdown} settings={cv.settings} theme={theme} inactive={tab !== 'preview'} />
       </main>
     </div>
   )

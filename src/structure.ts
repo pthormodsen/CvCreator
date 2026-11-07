@@ -14,7 +14,12 @@
 
 export type Layout = 'single' | 'sidebar'
 
-export function structureCv(html: string, layout: Layout): string {
+export type StructureOptions = {
+  contactLabel?: string // overskriften over kontaktinfo i sidekolonnen
+  sidebar?: string[] // ## seksjoner som skal i sidekolonnen. Tom: seksjoner med <dl>.
+}
+
+export function structureCv(html: string, layout: Layout, options: StructureOptions = {}): string {
   const doc = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html')
   const body = doc.body
 
@@ -41,16 +46,29 @@ export function structureCv(html: string, layout: Layout): string {
   } else {
     const sidebar = createEl(doc, 'aside', 'sidebar')
     const main = createEl(doc, 'div', 'main')
-    if (contact) sidebar.append(contact)
+    if (contact) {
+      // En ekte overskrift (ikke CSS content), så den blir med når PDF-en leses som tekst
+      const title = createEl(doc, 'h2', 'contact-title')
+      title.textContent = options.contactLabel ?? 'Contact'
+      contact.prepend(title)
+      sidebar.append(contact)
+    }
     main.append(...intro)
-    // Seksjoner med en <dl> (ferdigheter, språk o.l.) passer i sidekolonnen
-    sections.forEach((s) => (s.querySelector('dl') ? sidebar : main).append(s))
+    sections.forEach((s) => (belongsInSidebar(s, options.sidebar) ? sidebar : main).append(s))
     const columns = createEl(doc, 'div', 'columns')
     columns.append(sidebar, main)
     cv.append(columns)
   }
 
   return cv.outerHTML
+}
+
+// Valgt i front matter (sidebar: [Skills, Languages]), ellers: seksjoner med en <dl>
+// (ferdigheter, språk o.l.). Navnene sammenlignes uten forskjell på store og små bokstaver.
+function belongsInSidebar(section: HTMLElement, chosen?: string[]): boolean {
+  if (!chosen?.length) return section.querySelector('dl') !== null
+  const heading = section.querySelector('h2')?.textContent?.trim().toLowerCase() ?? ''
+  return chosen.some((name) => name.trim().toLowerCase() === heading)
 }
 
 function createEl(doc: Document, tag: string, className: string): HTMLElement {

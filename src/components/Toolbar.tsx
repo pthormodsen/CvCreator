@@ -7,6 +7,7 @@ import { ThemePicker } from './ThemePicker'
 
 type ToolbarProps = {
   markdown: string
+  filename: string // uten filendelse
   themeId: string
   saved: boolean
   onThemeChange: (id: string) => void
@@ -19,6 +20,7 @@ const ICON = 16 // ikonstørrelse i px
 
 export function Toolbar({
   markdown,
+  filename,
   themeId,
   saved,
   onThemeChange,
@@ -45,7 +47,7 @@ export function Toolbar({
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = 'cv.md'
+    link.download = `${filename}.md`
     link.click()
     URL.revokeObjectURL(url)
   }

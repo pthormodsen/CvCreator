@@ -2,10 +2,13 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { renderMarkdown } from '../markdown'
 import { structureCv } from '../structure'
 import { paginate, type Pagination } from '../pagination'
-import { themeVariables, type Theme } from '../themes'
+import type { Theme } from '../themes'
+import type { Settings } from '../settings'
+import { cvVariables } from '../cvStyle'
 
 type PreviewProps = {
-  markdown: string
+  markdown: string // hele teksten, front matter fjernes i renderMarkdown
+  settings: Settings
   theme: Theme
   inactive: boolean // skjult fane på mobil
 }
@@ -13,12 +16,22 @@ type PreviewProps = {
 // A4-bredde i CSS-piksler: 210 mm × 96 px per tomme / 25,4 mm per tomme
 const A4_WIDTH_PX = (210 * 96) / 25.4
 
-export function Preview({ markdown, theme, inactive }: PreviewProps) {
-  // markdown → HTML → CV-struktur. useMemo: kjør bare på nytt når tekst eller layout endres.
+export function Preview({ markdown, settings, theme, inactive }: PreviewProps) {
+  // markdown → HTML → CV-struktur. useMemo: kjør bare på nytt når noe av dette endres.
+  const contactLabel = settings.labels?.contact ?? theme.defaults.labels.contact
+  const sidebarKey = settings.sidebar?.join('\n') ?? ''
   const html = useMemo(
-    () => structureCv(renderMarkdown(markdown), theme.layout),
-    [markdown, theme.layout],
+    () =>
+      structureCv(renderMarkdown(markdown), theme.layout, {
+        contactLabel,
+        sidebar: sidebarKey ? sidebarKey.split('\n') : undefined,
+      }),
+    [markdown, theme.layout, contactLabel, sidebarKey],
   )
+
+  // Theme-standard + front matter → CSS-variabler på arket
+  const variables = cvVariables(theme, settings)
+  const variablesKey = JSON.stringify(variables)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const sheetRef = useRef<HTMLElement>(null)
@@ -51,7 +64,13 @@ export function Preview({ markdown, theme, inactive }: PreviewProps) {
   // Å måle DOM-en og lagre resultatet er et av tilfellene der setState i en effekt er riktig.
   useLayoutEffect(() => {
     measurePages()
-  }, [html, theme.id, measurePages])
+  }, [html, theme.id, variablesKey, settings.css, measurePages])
+
+  // Når en font er ferdig lastet, endres målene på teksten. Mål sidene på nytt da også.
+  useEffect(() => {
+    document.fonts.addEventListener('loadingdone', measurePages)
+    return () => document.fonts.removeEventListener('loadingdone', measurePages)
+  }, [measurePages])
 
   const pages = pagination?.pages ?? 1
 
@@ -87,12 +106,14 @@ export function Preview({ markdown, theme, inactive }: PreviewProps) {
       <div className="preview" ref={containerRef}>
         {/* zoom skalerer arket og linjene sammen, uten tomrom rundt */}
         <div className="sheet" style={{ zoom: scale }}>
+          {/* Egen CSS fra front matter, allerede renset og låst til .cv-page i settings.ts */}
+          {settings.css && <style>{settings.css}</style>}
           {/* .cv-page er A4-arket, og det eneste som blir med i utskriften. */}
           {/* dangerouslySetInnerHTML er greit her: HTML-en kommer fra brukerens egen tekst. */}
           <article
             ref={sheetRef}
             className={`cv-page theme-${theme.id}`}
-            style={{ ...themeVariables(theme.defaults), minHeight: pagination?.sheetHeight }}
+            style={{ ...variables, minHeight: pagination?.sheetHeight }}
             dangerouslySetInnerHTML={{ __html: html }}
           />
           {/* Stiplet linje der hver side slutter i PDF-en */}

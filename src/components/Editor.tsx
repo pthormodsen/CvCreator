@@ -1,15 +1,16 @@
 import { useState } from 'react'
-import { CircleHelp } from 'lucide-react'
+import { CircleHelp, TriangleAlert } from 'lucide-react'
 import { MarkdownEditor } from './MarkdownEditor'
 import { SyntaxHelp } from './SyntaxHelp'
 
 type EditorProps = {
   value: string
   onChange: (value: string) => void
+  warnings: string[] // problemer i innstillingene (front matter)
   inactive: boolean // skjult fane på mobil
 }
 
-export function Editor({ value, onChange, inactive }: EditorProps) {
+export function Editor({ value, onChange, warnings, inactive }: EditorProps) {
   // Om jukselappen er åpen, er bare UI-tilstand for denne komponenten
   const [showHelp, setShowHelp] = useState(false)
 
@@ -26,6 +27,16 @@ export function Editor({ value, onChange, inactive }: EditorProps) {
       </div>
       <div className="editor-body">
         {showHelp && <SyntaxHelp onClose={() => setShowHelp(false)} />}
+        {warnings.length > 0 && (
+          <div className="settings-warnings" role="status">
+            <TriangleAlert size={14} aria-hidden="true" />
+            <ul>
+              {warnings.map((warning) => (
+                <li key={warning}>{warning}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <MarkdownEditor value={value} onChange={onChange} labelledBy="editor-title" />
       </div>
     </section>

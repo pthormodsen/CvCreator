@@ -3,6 +3,7 @@ import MarkdownIt from 'markdown-it'
 import attrs from 'markdown-it-attrs'
 import bracketedSpans from 'markdown-it-bracketed-spans'
 import deflist from 'markdown-it-deflist'
+import { splitFrontMatter } from './settings'
 
 // Én delt markdown-it-instans. Pluginene gir oss Pandoc-syntaksen som CV-en bruker:
 //   [tekst]{.subtitle}      → <span class="subtitle"> (bracketed-spans + attrs)
@@ -34,7 +35,9 @@ function fencedDivsToHtml(source: string): string {
 // men det betyr også at en .md-fil fra noen andre kan inneholde <img onerror="..."> eller
 // <script>. markdown-it-attrs slipper i tillegg gjennom vilkårlige attributter ({onclick=...}).
 // DOMPurify fjerner alt som kan kjøre kode, og beholder vanlig HTML, klasser og lenker.
+// Front matter (innstillingene øverst) fjernes her, så den aldri havner i CV-en.
 export function renderMarkdown(source: string): string {
-  const html = md.render(fencedDivsToHtml(source))
+  const { body } = splitFrontMatter(source)
+  const html = md.render(fencedDivsToHtml(body))
   return DOMPurify.sanitize(html)
 }

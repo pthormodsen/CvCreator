@@ -65,16 +65,8 @@
     margin-bottom: 10px;
     overflow-wrap: anywhere;
 
-    &::before {
-      content: "Contact";
-      display: block;
-      font-size: var(--cv-heading-size);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--cv-accent);
-      margin-bottom: 3px;
-    }
+    /* Overskriften lages i structure.ts (teksten kan endres med labels.contact) */
+    .contact-title { margin: 0 0 3px; }
     a { display: block; margin-bottom: 1px; }
     .sep, br { display: none; }
   }
