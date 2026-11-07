@@ -1,0 +1,63 @@
+/* Minimal: svart-hvitt, serif, brede marger og seksjonstitler i egen venstremarg */
+
+@page minimal { size: A4; margin: 20mm 22mm; }
+
+.theme-minimal {
+  page: minimal;
+  --page-margin: 20mm 22mm;
+
+  --label-width: 34mm; /* bredden på kolonnen med seksjonstitler */
+
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: 9.5pt;
+  line-height: 1.55;
+  color: #000;
+
+  a { color: inherit; text-decoration: none; }
+  p { margin: 0 0 6px; }
+  ul { margin: 0 0 6px; padding-left: 14px; }
+  li { margin: 2px 0; }
+  li::marker { content: "– "; }
+
+  /* Header sentrert, med mye luft under */
+  .header { text-align: center; margin-bottom: 12mm; }
+  .header h1 {
+    margin: 0;
+    font-size: 22pt;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+  .header .subtitle { display: block; margin: 6px 0 0; font-style: italic; }
+  .identity p { margin: 0; }
+  .contact { margin-top: 8px; font-size: 8.5pt; }
+  .contact p { margin: 0; }
+
+  /* Seksjonstittel flyter i venstremargen, innholdet står til høyre */
+  section {
+    padding-left: calc(var(--label-width) + 4mm);
+    margin-bottom: 8mm;
+  }
+  h2 {
+    float: left;
+    width: var(--label-width);
+    margin: 1px 0 0 calc(-1 * (var(--label-width) + 4mm));
+    font-size: 7.5pt;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  h3 { font-size: 9.5pt; font-weight: 700; margin: 0 0 1px; }
+  .entry + .entry h3 { margin-top: 10px; }
+  h3 .aside { display: block; font-weight: 400; font-style: italic; }
+
+  .stack { font-size: 8.5pt; margin-bottom: 3px; }
+
+  dl { display: grid; grid-template-columns: max-content 1fr; column-gap: 14px; row-gap: 2px; margin: 0; }
+  dt { font-style: italic; }
+  dd { margin: 0; }
+
+  h2, h3, .stack { break-after: avoid; }
+  .entry, li, dl { break-inside: avoid; }
+}

@@ -1,0 +1,102 @@
+/* Stiler for selve appen (layout og knapper). CV-utseendet ligger i src/themes/. */
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  color: #1f2328;
+  background: #fff;
+}
+
+.app { height: 100%; display: flex; flex-direction: column; }
+
+/* Verktøylinje øverst */
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #d0d7de;
+  font-size: 14px;
+}
+.toolbar-title { font-weight: 700; }
+.toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
+
+.toolbar button,
+.toolbar select {
+  font: inherit;
+  padding: 5px 12px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  background: #f6f8fa;
+  color: inherit;
+  cursor: pointer;
+}
+.toolbar button:hover { background: #eef1f4; }
+.toolbar button.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+.toolbar button.primary:hover { background: #1a5fcc; }
+
+/* Delt skjerm: to like kolonner som fyller resten av høyden */
+.split {
+  flex: 1;
+  min-height: 0; /* lar barna scrolle i stedet for å strekke siden */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.editor {
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  border: none;
+  border-right: 1px solid #d0d7de;
+  resize: none;
+  outline: none;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  background: #fafbfc;
+}
+
+/* Grå "bordflate" som arket ligger på */
+.preview {
+  overflow: auto;
+  padding: 24px;
+  background: #e8eaed;
+}
+
+/* A4-arket. Margen (--page-margin) settes av hvert theme, likt som @page-margen. */
+.cv-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: var(--page-margin, 14mm 16mm);
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- Utskrift / PDF ---------- */
+
+/* Reserve hvis et theme ikke har sin egen @page */
+@page { size: A4; margin: 14mm 16mm; }
+
+@media print {
+  /* Skjul alt utenom CV-en */
+  .toolbar, .editor { display: none; }
+
+  /* Fjern høyde- og scroll-begrensninger, ellers blir bare første side med */
+  html, body, #root, .app { height: auto; }
+  .split, .preview { display: block; overflow: visible; padding: 0; background: none; }
+
+  /* Arket: @page står for margene, så ingen padding, skygge eller fast størrelse her */
+  .cv-page {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}
