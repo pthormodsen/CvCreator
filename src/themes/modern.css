@@ -68,7 +68,7 @@
     overflow-wrap: anywhere;
 
     &::before {
-      content: "Kontakt";
+      content: "Contact";
       display: block;
       font-size: 9.5pt;
       font-weight: 700;

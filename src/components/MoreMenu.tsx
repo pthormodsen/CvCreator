@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { useDismiss } from '../useDismiss'
 
 export type MenuItem = {
   label: string
+  icon?: ReactNode
   onSelect: () => void
   className?: string // f.eks. 'narrow-only' for punkter som bare vises på mobil
 }
@@ -11,7 +13,7 @@ type MoreMenuProps = {
   items: MenuItem[]
 }
 
-// «Mer»-meny for handlinger som ikke skal ligge rett ved de vanlige knappene
+// «More»-meny for handlinger som ikke skal ligge rett ved de vanlige knappene
 export function MoreMenu({ items }: MoreMenuProps) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -29,7 +31,8 @@ export function MoreMenu({ items }: MoreMenuProps) {
   return (
     <div className="menu" ref={ref}>
       <button aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)}>
-        Mer ▾
+        More
+        <ChevronDown size={14} aria-hidden="true" />
       </button>
       {open && (
         <div className="menu-list" role="menu">
@@ -43,6 +46,7 @@ export function MoreMenu({ items }: MoreMenuProps) {
                 item.onSelect()
               }}
             >
+              {item.icon}
               {item.label}
             </button>
           ))}

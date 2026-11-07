@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { CircleHelp } from 'lucide-react'
+import { MarkdownEditor } from './MarkdownEditor'
 import { SyntaxHelp } from './SyntaxHelp'
 
 type EditorProps = {
@@ -7,7 +9,6 @@ type EditorProps = {
   inactive: boolean // skjult fane på mobil
 }
 
-// "Kontrollert" textarea: React eier verdien, og hvert tastetrykk sendes opp til App.
 export function Editor({ value, onChange, inactive }: EditorProps) {
   // Om jukselappen er åpen, er bare UI-tilstand for denne komponenten
   const [showHelp, setShowHelp] = useState(false)
@@ -15,22 +16,17 @@ export function Editor({ value, onChange, inactive }: EditorProps) {
   return (
     <section className={inactive ? 'pane is-inactive' : 'pane'}>
       <div className="pane-header">
-        <label className="pane-title" htmlFor="editor">
+        <span className="pane-title" id="editor-title">
           Markdown
-        </label>
+        </span>
         <button className="pane-button" aria-expanded={showHelp} onClick={() => setShowHelp(!showHelp)}>
-          Syntaks
+          <CircleHelp size={14} aria-hidden="true" />
+          Syntax
         </button>
       </div>
       <div className="editor-body">
         {showHelp && <SyntaxHelp onClose={() => setShowHelp(false)} />}
-        <textarea
-          id="editor"
-          className="editor"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          spellCheck={false}
-        />
+        <MarkdownEditor value={value} onChange={onChange} labelledBy="editor-title" />
       </div>
     </section>
   )

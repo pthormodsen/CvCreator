@@ -1,66 +1,66 @@
-# Ola Nordmann
+# Alex Morgan
 
-Utvikler · Backend og skyløsninger
+Software Developer · Backend and Cloud
 
-[+47 400 00 000](tel:+4740000000) · [ola.nordmann@example.com](mailto:ola.nordmann@example.com)\
-[olanordmann.no](https://example.com) · [github.com/olanordmann](https://github.com)\
-[linkedin.com/in/olanordmann](https://www.linkedin.com)
+[+44 7700 900123](tel:+447700900123) · [alex.morgan@example.com](mailto:alex.morgan@example.com)\
+[alexmorgan.dev](https://example.com) · [github.com/alexmorgan](https://github.com)\
+[linkedin.com/in/alexmorgan](https://www.linkedin.com)
 
-## Profil
+## Profile
 
-Skriv to til fire setninger om hvem du er, hva du kan best og hva slags jobb du ser etter. Vær konkret: nevn teknologiene du bruker mest og ett eller to prosjekter du er stolt av.
+Write two to four sentences about who you are, what you do best and what kind of job you are looking for. Be specific: mention the technologies you use most and one or two projects you are proud of.
 
-## Ferdigheter
+## Skills
 
-- **Språk:** Java, TypeScript, Python, SQL
-- **Backend:** Spring Boot, Node.js, REST API
+- **Languages:** Java, TypeScript, Python, SQL
+- **Backend:** Spring Boot, Node.js, REST APIs
 - **Frontend:** React, HTML, CSS
-- **Databaser:** PostgreSQL, MongoDB
-- **Verktøy:** Git, Docker, GitHub Actions
+- **Databases:** PostgreSQL, MongoDB
+- **Tools:** Git, Docker, GitHub Actions
 
-## Prosjekter
+## Projects
 
-### Prosjektnavn | [Live](https://example.com) · [GitHub](https://github.com)
+### Project name | [Live](https://example.com) · [GitHub](https://github.com)
 
 *React · TypeScript · Spring Boot · PostgreSQL*
 
-Én eller to setninger om hva prosjektet er og hvem det er for.
+One or two sentences about what the project is and who it is for.
 
-- Hva du gjorde selv, ikke bare hva prosjektet gjør
-- Ta med tall der du kan, for eksempel brukere, ytelse eller testdekning
+- What you did yourself, not just what the project does
+- Include numbers where you can, such as users, performance or test coverage
 
-### Skoleprosjekt eller hobbyprosjekt | 2025
+### School or hobby project | 2025
 
 *Python · FastAPI*
 
-Kort beskrivelse. Bullet-punkter er valgfrie hvis én setning holder.
+A short description. Bullet points are optional if one sentence is enough.
 
-## Arbeidserfaring
+## Experience
 
-### Stillingstittel, Bedrift AS | jan. 2025 – nå · Bergen
+### Job title, Company Ltd | Jan 2025 – present · London
 
-- Hovedoppgave, med et konkret resultat
-- Ansvar du har fått eller noe du har forbedret
+- Main responsibility, with a concrete result
+- Something you were trusted with or improved
 
-### Deltidsjobb, Butikk AS | 2022 – 2024 · Oslo
+### Part-time job, Shop Ltd | 2022 – 2024 · Manchester
 
-- Kundeservice og daglig drift
+- Customer service and daily operations
 
-## Utdanning
+## Education
 
-### Bachelor i informatikk, Universitetet i Bergen | aug. 2022 – jun. 2025
+### BSc Computer Science, University of Leeds | Sep 2022 – Jun 2025
 
-Relevante emner: algoritmer og datastrukturer, databaser, programvareutvikling.
+Relevant courses: algorithms and data structures, databases, software engineering.
 
-### Studiespesialisering, Bergen katedralskole | 2019 – 2022
+### A-levels, Leeds Sixth Form College | 2020 – 2022
 
-## Verv og frivillig arbeid
+## Volunteering
 
-### Styremedlem, Studentforeningen | 2023 – 2024
+### Board member, Student Society | 2023 – 2024
 
-- Hva du bidro med
+- What you contributed
 
-## Språk
+## Languages
 
-- **Norsk:** morsmål
-- **Engelsk:** flytende
+- **English:** native
+- **Spanish:** conversational

@@ -22,7 +22,7 @@ export function Preview({ markdown, theme, inactive }: PreviewProps) {
 
   const containerRef = useRef<HTMLDivElement>(null)
   const sheetRef = useRef<HTMLElement>(null)
-  const [fit, setFit] = useState(true) // «Tilpass» eller «100 %»
+  const [fit, setFit] = useState(true) // «Fit» eller «100%»
   const [fitScale, setFitScale] = useState(1)
   const [pagination, setPagination] = useState<Pagination | null>(null)
   const scale = fit ? fitScale : 1
@@ -58,27 +58,27 @@ export function Preview({ markdown, theme, inactive }: PreviewProps) {
   return (
     <section className={inactive ? 'pane is-inactive' : 'pane'}>
       <div className="pane-header">
-        {/* På mobil står «Forhåndsvis» allerede i fanen, så tittelen skjules der */}
-        <span className="pane-title wide-only">Forhåndsvisning</span>
+        {/* På mobil står «Preview» allerede i fanen, så tittelen skjules der */}
+        <span className="pane-title wide-only">Preview</span>
         <div className="pane-actions">
           <span className="pane-info">
-            {pages} {pages === 1 ? 'side' : 'sider'}
+            {pages} {pages === 1 ? 'page' : 'pages'}
             {pagination && pagination.moved > 0 && (
               <span
                 className="pane-warning"
-                title="Blokker med rød ramme får ikke plass nederst på siden og flyttes til neste side i PDF-en."
+                title="Blocks with a red outline don’t fit at the bottom of the page and move to the next page in the PDF."
               >
                 {' '}
-                · {pagination.moved} flyttes
+                · {pagination.moved} moved
               </span>
             )}
           </span>
           <div className="segmented" role="group" aria-label="Zoom">
             <button aria-pressed={fit} onClick={() => setFit(true)}>
-              Tilpass{fit && fitScale < 1 ? ` ${Math.round(fitScale * 100)} %` : ''}
+              Fit{fit && fitScale < 1 ? ` ${Math.round(fitScale * 100)}%` : ''}
             </button>
             <button aria-pressed={!fit} onClick={() => setFit(false)}>
-              100 %
+              100%
             </button>
           </div>
         </div>
@@ -98,7 +98,7 @@ export function Preview({ markdown, theme, inactive }: PreviewProps) {
           {/* Stiplet linje der hver side slutter i PDF-en */}
           {pagination?.breaks.map((y, i) => (
             <div key={i} className="page-break" style={{ top: y }} aria-hidden="true">
-              <span>Side {i + 2}</span>
+              <span>Page {i + 2}</span>
             </div>
           ))}
         </div>

@@ -41,6 +41,7 @@ body {
   cursor: pointer;
 }
 :is(.toolbar, .pane-header, .syntax-help) button:hover { background: #eef1f4; }
+:is(.toolbar, .pane-header, .syntax-help, .tabs) button { display: inline-flex; align-items: center; gap: 6px; }
 :is(button, select):focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 
 /* ---------- Verktøylinje ---------- */
@@ -69,10 +70,35 @@ body {
 }
 .toolbar button.primary:hover { background: var(--primary-hover); }
 
-.theme-select { display: flex; align-items: center; gap: 6px; color: var(--muted); }
-.theme-select select { color: #1f2328; }
+/* Theme-velger: tre radioknapper med miniatyr. Selve rundingen er skjult. */
+.theme-picker { display: flex; gap: 4px; }
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 4px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.theme-option:hover { background: var(--surface); }
+.theme-option input { position: absolute; opacity: 0; pointer-events: none; }
+.theme-option:has(input:checked) { border-color: var(--primary); background: #f0f6ff; color: #1f2328; font-weight: 600; }
+.theme-option:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 1px; }
+.theme-thumbnail { width: 22px; height: 29px; flex-shrink: 0; display: block; }
 
-.save-status { margin-left: 4px; font-size: 13px; color: var(--success); cursor: default; white-space: nowrap; }
+.save-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  font-size: 13px;
+  color: var(--success);
+  cursor: default;
+  white-space: nowrap;
+}
 .save-status-error { color: var(--warning); }
 
 /* «Mer»-meny og PDF-hint: små bokser som legger seg over innholdet */
@@ -91,7 +117,7 @@ body {
 
 .menu-list { left: 0; min-width: 200px; padding: 4px; }
 .toolbar .menu-list button {
-  display: block;
+  display: flex;
   width: 100%;
   text-align: left;
   border: none;
@@ -114,12 +140,39 @@ body {
   flex: 1;
   min-height: 0; /* lar barna scrolle i stedet for å strekke siden */
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* editor | skillelinje | forhåndsvisning. --split settes fra App.tsx (standard 40 %). */
+  grid-template-columns: minmax(0, var(--split, 40%)) auto minmax(0, 1fr);
 }
+
+/* Skillelinjen: 9 px bred treffflate med en tynn strek i midten */
+.split-divider {
+  position: relative;
+  width: 9px;
+  margin: 0 -4px; /* overlapper panelene litt, så streken ikke tar plass */
+  z-index: 5;
+  cursor: col-resize;
+  touch-action: none;
+}
+.split-divider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 1px;
+  background: var(--border);
+  transition: background 0.15s, width 0.15s, left 0.15s;
+}
+.split-divider:hover::before,
+.split-divider:focus-visible::before,
+.is-resizing .split-divider::before { left: 3px; width: 3px; background: var(--primary); }
+.split-divider:focus-visible { outline: none; }
+
+/* Mens man drar: col-resize overalt og ingen tekstmarkering */
+.is-resizing { cursor: col-resize; user-select: none; }
 
 /* Hvert panel: overskrift øverst, innhold som fyller resten */
 .pane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
-.pane + .pane { border-left: 1px solid var(--border); }
 
 .pane-header {
   display: flex;
@@ -155,19 +208,8 @@ body {
 
 .editor-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
-.editor {
-  flex: 1;
-  width: 100%;
-  padding: 20px 24px;
-  border: none;
-  resize: none;
-  outline: none;
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #1f2328;
-  background: #fafbfc;
-}
+/* CodeMirror-editoren fyller resten av panelet. Utseendet ellers står i MarkdownEditor.tsx. */
+.editor-host { flex: 1; min-height: 0; }
 
 /* Jukselappen tar øverste del av editoren og scroller selv */
 .syntax-help {
@@ -250,6 +292,13 @@ body {
   }
 }
 
+/* ---------- Smal laptop: kortere verktøylinje ---------- */
+
+@media screen and (max-width: 1180px) {
+  .theme-name, .save-text { display: none; }
+  .theme-option { padding: 3px 4px; }
+}
+
 /* ---------- Smal skjerm (mobil): faner i stedet for to kolonner ---------- */
 
 @media screen and (max-width: 800px) {
@@ -262,6 +311,7 @@ body {
   .tabs { display: flex; border-bottom: 1px solid var(--border); }
   .tabs button {
     flex: 1;
+    justify-content: center;
     padding: 10px;
     font: inherit;
     font-size: 15px;
@@ -274,11 +324,11 @@ body {
 
   /* Ett panel om gangen */
   .split { grid-template-columns: 1fr; }
-  .pane + .pane { border-left: none; }
+  .split-divider { display: none; }
   .pane.is-inactive { display: none; }
 
   .pane-header { padding-left: 16px; flex-wrap: wrap; }
-  .editor { padding: 16px; }
+  .editor-host { --editor-gutter: 16px; }
   .syntax-help { padding: 12px 16px; max-height: 60%; }
   .syntax-rule { grid-template-columns: 1fr; gap: 4px; }
   .syntax-rule dt { padding-top: 0; }
@@ -294,8 +344,7 @@ body {
 
 @media print {
   /* Skjul alt utenom CV-en (også på mobil når «Skriv»-fanen er valgt) */
-  .toolbar, .tabs, .pane-header, .editor-body, .page-break { display: none !important; }
-  .pane + .pane { border: none; }
+  .toolbar, .tabs, .pane-header, .editor-body, .page-break, .split-divider { display: none !important; }
 
   /* Fjern høyde- og scroll-begrensninger, ellers blir bare første side med */
   html, body, #root, .app { height: auto; }

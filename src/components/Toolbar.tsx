@@ -1,8 +1,9 @@
 import { useCallback, useRef, useState, type ChangeEvent } from 'react'
-import { themes } from '../themes'
+import { Check, FileDown, FolderOpen, RotateCcw, Save, TriangleAlert } from 'lucide-react'
 import { load, save } from '../storage'
 import { useDismiss } from '../useDismiss'
 import { MoreMenu } from './MoreMenu'
+import { ThemePicker } from './ThemePicker'
 
 type ToolbarProps = {
   markdown: string
@@ -13,6 +14,8 @@ type ToolbarProps = {
   onReset: () => void
   onPrint: () => void
 }
+
+const ICON = 16 // ikonstørrelse i px
 
 export function Toolbar({
   markdown,
@@ -67,7 +70,7 @@ export function Toolbar({
 
   return (
     <header className="toolbar">
-      {/* Venstre: filhandlinger og lagringsstatus. På mobil ligger filhandlingene i «Mer». */}
+      {/* Venstre: filhandlinger og lagringsstatus. På mobil ligger filhandlingene i «More». */}
       <div className="toolbar-group">
         <span className="toolbar-title wide-only">CV Builder</span>
         <input
@@ -78,16 +81,32 @@ export function Toolbar({
           hidden
         />
         <button className="wide-only" onClick={openFilePicker}>
-          Last opp .md
+          <FolderOpen size={ICON} aria-hidden="true" />
+          Open
         </button>
         <button className="wide-only" onClick={downloadMarkdown}>
-          Last ned .md
+          <Save size={ICON} aria-hidden="true" />
+          Save as file
         </button>
         <MoreMenu
           items={[
-            { label: 'Last opp .md', onSelect: openFilePicker, className: 'narrow-only' },
-            { label: 'Last ned .md', onSelect: downloadMarkdown, className: 'narrow-only' },
-            { label: 'Tilbakestill til eksempel', onSelect: onReset },
+            {
+              label: 'Open',
+              icon: <FolderOpen size={ICON} aria-hidden="true" />,
+              onSelect: openFilePicker,
+              className: 'narrow-only',
+            },
+            {
+              label: 'Save as file',
+              icon: <Save size={ICON} aria-hidden="true" />,
+              onSelect: downloadMarkdown,
+              className: 'narrow-only',
+            },
+            {
+              label: 'Reset to example',
+              icon: <RotateCcw size={ICON} aria-hidden="true" />,
+              onSelect: onReset,
+            },
           ]}
         />
         <span
@@ -95,46 +114,36 @@ export function Toolbar({
           role="status"
           title={
             saved
-              ? 'Teksten og valgt theme lagres automatisk i denne nettleseren.'
-              : 'Nettleseren tillater ikke lagring (f.eks. privat modus). Last ned .md for å ta vare på teksten.'
+              ? 'Your text and theme are saved automatically in this browser.'
+              : 'Your browser does not allow saving (for example in private mode). Use “Save as file” to keep your text.'
           }
         >
-          {saved ? '✓' : '⚠'}
-          <span className="wide-only">{saved ? ' Lagret i nettleseren' : ' Ikke lagret'}</span>
+          {saved ? <Check size={ICON} aria-hidden="true" /> : <TriangleAlert size={ICON} aria-hidden="true" />}
+          <span className="save-text">{saved ? 'Saved in browser' : 'Not saved'}</span>
         </span>
       </div>
 
       {/* Høyre: utseende og hovedhandlingen */}
       <div className="toolbar-group">
-        <label className="theme-select">
-          <span className="wide-only">Theme</span>
-          <select
-            value={themeId}
-            aria-label="Theme"
-            onChange={(e) => onThemeChange(e.target.value)}
-          >
-            {themes.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <ThemePicker themeId={themeId} onChange={onThemeChange} />
 
         <div className="pdf-action" ref={pdfRef}>
           <button className="primary" onClick={handlePdfClick}>
-            Last ned PDF
+            <FileDown size={ICON} aria-hidden="true" />
+            <span>
+              <span className="wide-only">Download </span>PDF
+            </span>
           </button>
           {showPdfHint && (
-            <div className="popover" role="dialog" aria-label="Slik lagrer du PDF">
+            <div className="popover" role="dialog" aria-label="How to save the PDF">
               <p>
-                PDF-en lages med nettleserens utskrift. Velg <strong>Lagre som PDF</strong> i
-                dialogen.
+                The PDF is made with your browser’s print dialog. Choose <strong>Save as PDF</strong>{' '}
+                as the destination.
               </p>
               <div className="popover-actions">
-                <button onClick={closePdfHint}>Avbryt</button>
+                <button onClick={closePdfHint}>Cancel</button>
                 <button className="primary" autoFocus onClick={confirmPdf}>
-                  Åpne utskrift
+                  Open print dialog
                 </button>
               </div>
             </div>

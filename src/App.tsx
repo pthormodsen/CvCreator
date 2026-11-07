@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
+import { Eye, Pencil } from 'lucide-react'
 import { Editor } from './components/Editor'
 import { Preview } from './components/Preview'
 import { Toolbar } from './components/Toolbar'
+import { SplitDivider } from './components/SplitDivider'
+import { clampSplit, DEFAULT_SPLIT } from './split'
 import { findTheme } from './themes'
 import { load, save } from './storage'
 import defaultCv from './defaultCv.md?raw'
@@ -14,6 +17,13 @@ export default function App() {
   const [saved, setSaved] = useState(true)
   // Hvilken fane som vises på smal skjerm. På bred skjerm vises begge panelene.
   const [tab, setTab] = useState<'write' | 'preview'>('write')
+  // Hvor stor andel av bredden editoren får (0.4 = 40 %). Lagres når brukeren slipper skillelinjen.
+  const [split, setSplit] = useState(() => clampSplit(Number(load('split', String(DEFAULT_SPLIT)))))
+
+  function commitSplit(ratio: number) {
+    setSplit(ratio)
+    save('split', String(ratio))
+  }
 
   // All endring av tekst og theme går gjennom disse to, som også lagrer
   // og husker om lagringen lyktes (vises som «Lagret» i verktøylinjen).
@@ -34,7 +44,7 @@ export default function App() {
   }
 
   function handleUpload(text: string) {
-    if (confirmReplace('Erstatte teksten med filen du lastet opp? Det du har skrevet nå blir borte.')) {
+    if (confirmReplace('Replace your text with the file you opened? What you have written will be lost.')) {
       updateMarkdown(text)
     }
   }
@@ -42,7 +52,7 @@ export default function App() {
   function handleReset() {
     if (
       confirmReplace(
-        'Erstatte teksten med eksempel-CV-en? Det du har skrevet blir borte. Last ned .md først hvis du vil beholde det.',
+        'Replace your text with the example CV? What you have written will be lost. Use “Save as file” first if you want to keep it.',
       )
     ) {
       updateMarkdown(defaultCv)
@@ -72,14 +82,18 @@ export default function App() {
       {/* Faner, bare synlige på smal skjerm (se .tabs i index.css) */}
       <nav className="tabs" role="tablist">
         <button role="tab" aria-selected={tab === 'write'} onClick={() => setTab('write')}>
-          Skriv
+          <Pencil size={16} aria-hidden="true" />
+          Write
         </button>
         <button role="tab" aria-selected={tab === 'preview'} onClick={() => setTab('preview')}>
-          Forhåndsvis
+          <Eye size={16} aria-hidden="true" />
+          Preview
         </button>
       </nav>
-      <main className="split">
+      {/* --split styrer kolonnebredden i CSS, så mobil-layouten fortsatt kan overstyre den */}
+      <main className="split" style={{ '--split': `${split * 100}%` } as CSSProperties}>
         <Editor value={markdown} onChange={updateMarkdown} inactive={tab !== 'write'} />
+        <SplitDivider ratio={split} onChange={setSplit} onCommit={commitSplit} />
         <Preview markdown={markdown} theme={findTheme(themeId)} inactive={tab !== 'preview'} />
       </main>
     </div>
