@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { renderMarkdown } from './markdown'
 import { structureCv, type Layout } from './structure'
+import { parseCv } from './settings'
 import defaultCv from './defaultCv.md?raw'
 // Samme CV skrevet på to måter: vanlig markdown og Pandoc-syntaks
 import plainCv from './__fixtures__/cv-plain.md?raw'
@@ -233,6 +234,13 @@ describe('layout', () => {
 
 // Standardteksten nye brukere ser: den skal vise frem alle reglene
 describe('eksempelteksten (defaultCv.md)', () => {
+  it('har gyldig front matter som ikke vises i CV-en', () => {
+    const cv = parseCv(defaultCv)
+    expect(cv.frontMatter).not.toBeNull()
+    expect(cv.warnings).toEqual([])
+    expect(renderMarkdown(defaultCv)).not.toContain('Settings for this CV')
+  })
+
   it('gir header, kontakt, datoer, teknologilinjer og ferdigheter', () => {
     const s = summarize(build(defaultCv))
     expect(s.name).toHaveLength(1)

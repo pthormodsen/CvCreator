@@ -1,3 +1,10 @@
+---
+# Settings for this CV. Edit them here or in the Customize tab.
+# Delete a line to use the theme default. Open Syntax to see all settings.
+theme: classic
+labels:
+  contact: Contact
+---
 # Alex Morgan
 
 Software Developer · Backend and Cloud

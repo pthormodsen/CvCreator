@@ -6,11 +6,19 @@ export type SyntaxRule = {
   title: string
   example: string
   result: string
-  selector: string // CSS-selektor eksempelet skal gi (brukes i testen)
+  selector?: string // CSS-selektor eksempelet skal gi (brukes i testen)
   afterName?: boolean // regelen gjelder bare under # Navn (testen legger det til)
+  settings?: boolean // eksempelet er front matter: testen sjekker at det er gyldig og ikke vises
 }
 
 export const syntaxRules: SyntaxRule[] = [
+  {
+    title: 'Settings',
+    example: '---\ntheme: modern\naccent: "#0f766e"\nfont: Inter\nlabels:\n  contact: Contact\n---',
+    result:
+      'Optional block at the very top, between two --- lines. It is never shown in the CV. The Customize tab writes here too. All settings are listed below.',
+    settings: true,
+  },
   {
     title: 'Name',
     example: '# Alex Morgan',

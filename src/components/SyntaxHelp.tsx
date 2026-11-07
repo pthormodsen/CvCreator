@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
 import { syntaxRules } from '../syntaxRules'
+import { settingDocs } from '../settings'
 
 type SyntaxHelpProps = {
   onClose: () => void
@@ -28,6 +29,26 @@ export function SyntaxHelp({ onClose }: SyntaxHelpProps) {
           </div>
         ))}
       </dl>
+
+      <h4 className="syntax-help-subtitle">All settings</h4>
+      <table className="syntax-settings">
+        <tbody>
+          {settingDocs.map((doc) => (
+            <tr key={doc.key}>
+              <td>
+                <code>
+                  {doc.key}: {doc.example}
+                </code>
+              </td>
+              <td>{doc.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="syntax-help-note">
+        Invalid values are ignored and shown as a warning above the editor. Lengths can be written
+        in mm, cm, pt or px.
+      </p>
 
       <p className="syntax-help-note">
         Each ### and the text below it stays together on one page in the PDF. Pandoc syntax (
