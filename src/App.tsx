@@ -8,6 +8,8 @@ import { clampSplit, DEFAULT_SPLIT } from './split'
 import { findTheme } from './themes'
 import { load, remove, save } from './storage'
 import { parseCv, updateFrontMatter } from './settings'
+import { effectiveValues } from './cvStyle'
+import { fontsReadyFor } from './fonts'
 import defaultCv from './defaultCv.md?raw'
 
 // Startteksten. Tidligere lå valgt theme i localStorage. Nå står det i front matter
@@ -82,7 +84,9 @@ export default function App() {
   const name = cv.body.match(/^#\s+(.+)$/m)?.[1].trim()
   const filename = cv.settings.filename ?? (name ? `CV - ${name}` : 'CV')
 
-  function handlePrint() {
+  async function handlePrint() {
+    // Fonten må være lastet før utskrift, ellers kan PDF-en få reservefonten
+    await fontsReadyFor(effectiveValues(theme, cv.settings).font)
     // Nettleseren foreslår document.title som filnavn for PDF-en
     const previousTitle = document.title
     document.title = filename
