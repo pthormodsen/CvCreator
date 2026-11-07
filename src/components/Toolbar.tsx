@@ -127,7 +127,7 @@ export function Toolbar({
 
       {/* Høyre: utseende og hovedhandlingen */}
       <div className="toolbar-group">
-        <ThemePicker themeId={themeId} onChange={onThemeChange} />
+        <ThemePicker name="toolbar-theme" themeId={themeId} onChange={onThemeChange} />
 
         <div className="pdf-action" ref={pdfRef}>
           <button className="primary" onClick={handlePdfClick}>

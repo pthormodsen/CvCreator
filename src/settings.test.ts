@@ -177,6 +177,12 @@ describe('skrive til front matter', () => {
     expect(parseCv(result).settings.labels?.contact).toBe('Kontakt')
   })
 
+  it('skriver lister på én linje', () => {
+    expect(updateFrontMatter(cvBody, ['sidebar'], ['Skills', 'Languages'])).toBe(
+      `---\nsidebar: [Skills, Languages]\n---\n${cvBody}`,
+    )
+  })
+
   it('fjerner tomme grupper og hele blokken når siste verdi fjernes', () => {
     const withLabel = updateFrontMatter(cvBody, ['labels', 'contact'], 'Kontakt')
     expect(updateFrontMatter(withLabel, ['labels', 'contact'], undefined)).toBe(cvBody)

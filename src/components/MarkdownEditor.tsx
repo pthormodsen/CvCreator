@@ -1,11 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useImperativeHandle, useRef, type Ref } from 'react'
 import { EditorState, RangeSetBuilder, StateField, type Text } from '@codemirror/state'
 import { Decoration, EditorView, keymap, placeholder, type DecorationSet } from '@codemirror/view'
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import { defaultKeymap, history, historyKeymap, isolateHistory, redo, undo } from '@codemirror/commands'
 import { HighlightStyle, LanguageSupport, syntaxHighlighting } from '@codemirror/language'
 import { commonmarkLanguage } from '@codemirror/lang-markdown'
 import { tags } from '@lezer/highlight'
 import { splitFrontMatter } from '../settings'
+import { minimalChange } from '../textDiff'
 
 // Fargene for markdown. lang-markdown gir hver del av teksten en "tag",
 // og her bestemmer vi hvordan hver tag ser ut.
@@ -61,13 +62,19 @@ const editorTheme = EditorView.theme({
   '.cm-frontmatter': { backgroundColor: '#f2f4f6' },
 })
 
+// Det andre komponenter kan be editoren om (Customize-panelet bruker undo/redo,
+// så Cmd+Z virker der også, med samme historikk som editoren)
+export type EditorController = { undo: () => void; redo: () => void }
+
 type MarkdownEditorProps = {
   value: string
   onChange: (value: string) => void
   labelledBy: string // id-en til overskriften, for skjermlesere
+  hidden?: boolean // skjult mens Customize-fanen er åpen (beholdes for å huske historikken)
+  ref?: Ref<EditorController>
 }
 
-export function MarkdownEditor({ value, onChange, labelledBy }: MarkdownEditorProps) {
+export function MarkdownEditor({ value, onChange, labelledBy, hidden, ref }: MarkdownEditorProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
 
@@ -112,13 +119,30 @@ export function MarkdownEditor({ value, onChange, labelledBy }: MarkdownEditorPr
     return () => view.destroy()
   }, [labelledBy])
 
-  // Når teksten endres utenfra (Open, Reset), bytt innholdet i editoren
+  // Når teksten endres utenfra (Open, Reset, Customize), send bare den delen som er ny.
+  // Da blir markøren stående der den var, og endringen kan angres med Cmd+Z.
+  //
+  // Angre-steg: endringer på samme linje innen ett sekund (en slider som dras) blir ett steg.
+  // Alt annet (en annen innstilling, «Reset to theme defaults») blir sitt eget steg, uansett
+  // hvor raskt det skjer etter forrige endring.
+  const lastExternal = useRef<{ line: number; time: number } | null>(null)
   useEffect(() => {
     const view = viewRef.current
-    if (view && view.state.doc.toString() !== value) {
-      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: value } })
-    }
+    if (!view) return
+    const change = minimalChange(view.state.doc.toString(), value)
+    if (!change) return
+    const line = view.state.doc.lineAt(change.from).number
+    const now = Date.now()
+    const previous = lastExternal.current
+    const sameGroup = previous !== null && previous.line === line && now - previous.time < 1000
+    view.dispatch({ changes: change, annotations: sameGroup ? [] : [isolateHistory.of('before')] })
+    lastExternal.current = { line, time: now }
   }, [value])
 
-  return <div className="editor-host" ref={hostRef} />
+  useImperativeHandle(ref, () => ({
+    undo: () => viewRef.current && undo(viewRef.current),
+    redo: () => viewRef.current && redo(viewRef.current),
+  }))
+
+  return <div className={hidden ? 'editor-host is-hidden' : 'editor-host'} ref={hostRef} />
 }

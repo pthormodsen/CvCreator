@@ -51,18 +51,19 @@ const thumbnails: Record<string, ReactNode> = {
 type ThemePickerProps = {
   themeId: string
   onChange: (id: string) => void
+  name: string // unikt per velger, ellers blir to velgere på siden én radiogruppe
 }
 
 // Ekte radioknapper (skjult) under miniatyrene: da får vi piltaster og
 // skjermleserstøtte fra nettleseren uten ekstra kode.
-export function ThemePicker({ themeId, onChange }: ThemePickerProps) {
+export function ThemePicker({ themeId, onChange, name }: ThemePickerProps) {
   return (
     <div className="theme-picker" role="radiogroup" aria-label="Theme">
       {themes.map((theme) => (
         <label key={theme.id} className="theme-option" title={theme.name}>
           <input
             type="radio"
-            name="theme"
+            name={name}
             value={theme.id}
             checked={theme.id === themeId}
             onChange={() => onChange(theme.id)}

@@ -58,6 +58,19 @@ export default function App() {
     updateMarkdown(updateFrontMatter(markdown, ['theme'], id === 'classic' ? undefined : id))
   }
 
+  // Customize-panelet: sett eller fjern (undefined) én innstilling i front matter
+  function updateSetting(path: string[], value: unknown) {
+    updateMarkdown(updateFrontMatter(markdown, path, value))
+  }
+
+  // «Reset to theme defaults»: fjern alle utseende-innstillingene i én endring (ett Cmd+Z).
+  // Theme, filnavn og egen CSS beholdes.
+  function resetSettings() {
+    if (!window.confirm('Reset colors, font, sizes, spacing, labels and sidebar to the theme defaults?')) return
+    const keys = ['accent', 'font', 'font-size', 'line-height', 'margins', 'section-gap', 'entry-gap', 'labels', 'sidebar']
+    updateMarkdown(keys.reduce((text, key) => updateFrontMatter(text, [key], undefined), markdown))
+  }
+
   // Spør før vi erstatter tekst brukeren har skrevet selv
   function confirmReplace(message: string): boolean {
     const untouched = markdown.trim() === '' || markdown === defaultCv
@@ -119,7 +132,18 @@ export default function App() {
       </nav>
       {/* --split styrer kolonnebredden i CSS, så mobil-layouten fortsatt kan overstyre den */}
       <main className="split" style={{ '--split': `${split * 100}%` } as CSSProperties}>
-        <Editor value={markdown} onChange={updateMarkdown} warnings={cv.warnings} inactive={tab !== 'write'} />
+        <Editor
+          value={markdown}
+          onChange={updateMarkdown}
+          settings={cv.settings}
+          theme={theme}
+          warnings={cv.warnings}
+          yamlOk={cv.yamlOk}
+          onSetSetting={updateSetting}
+          onResetSettings={resetSettings}
+          onThemeChange={updateTheme}
+          inactive={tab !== 'write'}
+        />
         <SplitDivider ratio={split} onChange={setSplit} onCommit={commitSplit} />
         <Preview markdown={markdown} settings={cv.settings} theme={theme} inactive={tab !== 'preview'} />
       </main>

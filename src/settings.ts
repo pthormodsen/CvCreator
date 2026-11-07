@@ -245,6 +245,11 @@ export function updateFrontMatter(source: string, path: string[], value: unknown
       const parent = doc.getIn(path.slice(0, -1))
       if (isMap(parent) && parent.items.length === 0) doc.deleteIn(path.slice(0, -1))
     }
+  } else if (Array.isArray(value)) {
+    // Lister på én linje: sidebar: [Skills, Languages]
+    const node = doc.createNode(value)
+    node.flow = true
+    doc.setIn(path, node)
   } else {
     doc.setIn(path, value)
   }
