@@ -254,11 +254,10 @@ body {
 /* .sheet holder arket og sidelinjene. zoom settes fra Preview.tsx og skalerer begge. */
 .sheet { position: relative; width: 210mm; margin: 0 auto; }
 
-/* A4-arket. Margen (--page-margin) settes av hvert theme. */
+/* A4-arket. Marger, font og farger kommer fra themes/base.css og variablene. */
 .cv-page {
   width: 210mm;
   min-height: 297mm;
-  padding: var(--page-margin, 14mm 16mm);
   background: #fff;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
 }

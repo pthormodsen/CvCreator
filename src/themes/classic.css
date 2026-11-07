@@ -1,23 +1,24 @@
-/* Classic: basert på ~/Desktop/Jobbsøking/Cv/style.css */
+/* Classic: basert på ~/Desktop/Jobbsøking/Cv/style.css.
+   Farge, font, størrelse, marger og avstander kommer fra variablene (se base.css). */
 
 .theme-classic {
-  --page-margin: 14mm 16mm; /* marg rundt innholdet, både på skjerm og i PDF */
+  --cv-text: #1f2328;
+  --cv-muted: #5a6270;
+  --cv-line: #d0d7de;
 
-  --accent: #1f4e79;
-  --text: #1f2328;
-  --muted: #5a6270;
-  --line: #d0d7de;
+  /* Størrelser i forhold til skriftstørrelsen. Ved 9,5pt blir de 23pt, 10,5pt osv. */
+  --cv-name-size: calc(var(--cv-font-size) * 23 / 9.5);
+  --cv-subtitle-size: calc(var(--cv-font-size) * 10.5 / 9.5);
+  --cv-contact-size: calc(var(--cv-font-size) * 9 / 9.5);
+  --cv-heading-size: calc(var(--cv-font-size) * 10.5 / 9.5);
+  --cv-title-size: calc(var(--cv-font-size) * 10 / 9.5);
+  --cv-small-size: calc(var(--cv-font-size) * 8.75 / 9.5);
 
-  font-family: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
-  font-size: 9.5pt;
-  line-height: 1.4;
-  color: var(--text);
-
-  a { color: var(--accent); text-decoration: none; }
+  a { color: var(--cv-accent); text-decoration: none; }
   p { margin: 2px 0 4px; }
   ul { margin: 2px 0 4px; padding-left: 16px; }
   li { margin: 1px 0; }
-  li::marker { color: var(--muted); }
+  li::marker { color: var(--cv-muted); }
 
   /* Header: navn og undertittel til venstre, kontakt til høyre */
   .header {
@@ -26,20 +27,20 @@
     align-items: flex-end;
     gap: 24px;
     padding-bottom: 10px;
-    border-bottom: 2px solid var(--accent);
+    border-bottom: 2px solid var(--cv-accent);
     margin-bottom: 4px;
   }
   .header h1 {
-    font-size: 23pt;
+    font-size: var(--cv-name-size);
     line-height: 1.05;
     margin: 0;
-    color: var(--accent);
+    color: var(--cv-accent);
     letter-spacing: -0.4px;
   }
   .header .subtitle {
     display: block;
     margin-top: 4px;
-    font-size: 10.5pt;
+    font-size: var(--cv-subtitle-size);
     font-weight: 500;
     white-space: nowrap;
   }
@@ -47,21 +48,21 @@
   .contact p {
     margin: 0;
     text-align: right;
-    font-size: 9pt;
+    font-size: var(--cv-contact-size);
     line-height: 1.55;
-    color: var(--muted);
+    color: var(--cv-muted);
     white-space: nowrap;
   }
 
   /* Seksjoner */
   h2 {
-    font-size: 10.5pt;
+    font-size: var(--cv-heading-size);
     text-transform: uppercase;
     letter-spacing: 1.2px;
-    color: var(--accent);
-    border-bottom: 1px solid var(--line);
+    color: var(--cv-accent);
+    border-bottom: 1px solid var(--cv-line);
     padding-bottom: 2px;
-    margin: 13px 0 5px;
+    margin: var(--cv-section-gap) 0 5px;
   }
 
   /* Underoverskrifter: tittel til venstre, dato eller lenker til høyre */
@@ -70,18 +71,18 @@
     justify-content: space-between;
     align-items: baseline;
     gap: 16px;
-    font-size: 10pt;
+    font-size: var(--cv-title-size);
     font-weight: 600;
-    margin: 9px 0 1px;
+    margin: var(--cv-entry-gap) 0 1px;
   }
   h3 .aside {
     flex-shrink: 0;
-    font-size: 8.75pt;
+    font-size: var(--cv-small-size);
     font-weight: 400;
-    color: var(--muted);
+    color: var(--cv-muted);
   }
 
-  .stack { margin: 0 0 2px; font-size: 8.75pt; color: var(--muted); font-style: italic; }
+  .stack { margin: 0 0 2px; font-size: var(--cv-small-size); color: var(--cv-muted); font-style: italic; }
 
   /* Ferdigheter som to kolonner */
   dl {

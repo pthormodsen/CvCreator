@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { renderMarkdown } from '../markdown'
 import { structureCv } from '../structure'
 import { paginate, type Pagination } from '../pagination'
-import type { Theme } from '../themes'
+import { themeVariables, type Theme } from '../themes'
 
 type PreviewProps = {
   markdown: string
@@ -92,7 +92,7 @@ export function Preview({ markdown, theme, inactive }: PreviewProps) {
           <article
             ref={sheetRef}
             className={`cv-page theme-${theme.id}`}
-            style={{ minHeight: pagination?.sheetHeight }}
+            style={{ ...themeVariables(theme.defaults), minHeight: pagination?.sheetHeight }}
             dangerouslySetInnerHTML={{ __html: html }}
           />
           {/* Stiplet linje der hver side slutter i PDF-en */}

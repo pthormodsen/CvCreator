@@ -1,0 +1,21 @@
+/* Felles for alle themes. Variablene settes på arket fra themes/index.ts (standardverdier)
+   og fra front matter (brukerens valg):
+
+   --cv-accent        aksentfarge
+   --cv-font          font (font-family)
+   --cv-font-size     skriftstørrelse for brødtekst. Andre størrelser regnes ut fra denne.
+   --cv-line-height   linjehøyde
+   --cv-margins       marger rundt innholdet, både på skjerm og i PDF (topp/bunn sider)
+   --cv-section-gap   avstand over hver ## seksjon
+   --cv-entry-gap     avstand over hver ### erfaring
+
+   Hvert theme definerer i tillegg sine egne: --cv-text, --cv-muted og størrelser
+   som --cv-name-size (alltid som forhold til --cv-font-size). */
+
+.cv-page {
+  padding: var(--cv-margins);
+  font-family: var(--cv-font);
+  font-size: var(--cv-font-size);
+  line-height: var(--cv-line-height);
+  color: var(--cv-text);
+}

@@ -1,18 +1,16 @@
-/* Modern: sidekolonne med kontaktinfo og ferdigheter, grønnblå aksentfarge.
-   All tekst er minst 9pt. */
+/* Modern: sidekolonne med kontaktinfo og ferdigheter.
+   Farge, font, størrelse, marger og avstander kommer fra variablene (se base.css). */
 
 .theme-modern {
-  --page-margin: 12mm 13mm; /* marg rundt innholdet, både på skjerm og i PDF */
+  --cv-text: #1e293b;
+  --cv-muted: #64748b;
+  --cv-accent-soft: #e6f2f1; /* bakgrunn i sidekolonnen (regnes ut fra accent hvis den endres) */
+  --cv-sidebar-width: 55mm;
 
-  --accent: #0f766e;
-  --accent-soft: #e6f2f1;
-  --text: #1e293b;
-  --muted: #64748b;
+  /* Størrelser i forhold til skriftstørrelsen. Ved 9pt blir de 22pt og 9,5pt. */
+  --cv-name-size: calc(var(--cv-font-size) * 22 / 9);
+  --cv-heading-size: calc(var(--cv-font-size) * 9.5 / 9);
 
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 9pt;
-  line-height: 1.38;
-  color: var(--text);
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact; /* behold bakgrunnsfarger i PDF */
 
@@ -20,21 +18,21 @@
   p { margin: 0 0 3px; }
   ul { margin: 2px 0 3px; padding-left: 14px; }
   li { margin: 0; }
-  li::marker { color: var(--accent); }
+  li::marker { color: var(--cv-accent); }
 
   /* Header: farget bånd over hele bredden */
   .header {
-    background: var(--accent);
+    background: var(--cv-accent);
     color: #fff;
     padding: 6mm 7mm;
     margin-bottom: 5mm;
     border-radius: 3px;
   }
-  .header h1 { margin: 0; font-size: 22pt; line-height: 1.1; font-weight: 700; letter-spacing: -0.5px; }
+  .header h1 { margin: 0; font-size: var(--cv-name-size); line-height: 1.1; font-weight: 700; letter-spacing: -0.5px; }
   .header .subtitle {
     display: block;
     margin: 3px 0 0;
-    font-size: 9.5pt;
+    font-size: var(--cv-heading-size);
     text-transform: uppercase;
     letter-spacing: 1.2px;
     opacity: 0.85;
@@ -43,22 +41,22 @@
   /* To kolonner: smal sidekolonne til venstre */
   .columns {
     display: grid;
-    grid-template-columns: 55mm 1fr;
+    grid-template-columns: var(--cv-sidebar-width) 1fr;
     gap: 5mm;
   }
 
   .sidebar {
-    background: var(--accent-soft);
+    background: var(--cv-accent-soft);
     padding: 3.5mm;
     border-radius: 3px;
     align-self: start;
 
-    h2 { margin-top: 10px; }
+    h2 { margin-top: var(--cv-section-gap); }
     section:first-of-type h2 { margin-top: 0; }
 
     /* Ferdigheter stablet: etikett over verdi */
     dl { margin: 0; }
-    dt { font-weight: 600; color: var(--accent); }
+    dt { font-weight: 600; color: var(--cv-accent); }
     dd { margin: 0 0 4px; }
   }
 
@@ -70,11 +68,11 @@
     &::before {
       content: "Contact";
       display: block;
-      font-size: 9.5pt;
+      font-size: var(--cv-heading-size);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1.2px;
-      color: var(--accent);
+      color: var(--cv-accent);
       margin-bottom: 3px;
     }
     a { display: block; margin-bottom: 1px; }
@@ -82,14 +80,14 @@
   }
 
   h2 {
-    font-size: 9.5pt;
+    font-size: var(--cv-heading-size);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1.2px;
-    color: var(--accent);
+    color: var(--cv-accent);
     margin: 0 0 4px;
   }
-  .main section + section h2 { margin-top: 10px; }
+  .main section + section h2 { margin-top: var(--cv-section-gap); }
 
   /* Tittel til venstre, dato/lenker til høyre. Hopper til neste linje hvis det ikke er plass. */
   h3 {
@@ -97,18 +95,18 @@
     flex-wrap: wrap;
     align-items: baseline;
     column-gap: 10px;
-    font-size: 9.5pt;
+    font-size: var(--cv-heading-size);
     font-weight: 650;
-    margin: 6px 0 1px;
+    margin: var(--cv-entry-gap) 0 1px;
   }
   h3 .aside {
     margin-left: auto;
     font-weight: 400;
-    color: var(--muted);
-    a { color: var(--accent); }
+    color: var(--cv-muted);
+    a { color: var(--cv-accent); }
   }
 
-  .stack { color: var(--accent); margin-bottom: 2px; }
+  .stack { color: var(--cv-accent); margin-bottom: 2px; }
   .stack em { font-style: normal; }
 
   h2, h3, .stack { break-after: avoid; }

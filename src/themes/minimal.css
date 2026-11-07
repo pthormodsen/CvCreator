@@ -1,16 +1,13 @@
 /* Minimal: svart-hvitt, serif og seksjonstitler i egen venstremarg.
-   All tekst er minst 9pt. */
+   Farge, font, størrelse, marger og avstander kommer fra variablene (se base.css). */
 
 .theme-minimal {
-  --page-margin: 16mm 18mm; /* marg rundt innholdet, både på skjerm og i PDF */
+  --cv-text: #000;
+  --cv-label-width: 26mm; /* bredden på kolonnen med seksjonstitler */
+  --cv-label-gap: 5mm;
 
-  --label-width: 26mm; /* bredden på kolonnen med seksjonstitler */
-  --label-gap: 5mm;
-
-  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  font-size: 9pt;
-  line-height: 1.4;
-  color: #000;
+  /* Størrelser i forhold til skriftstørrelsen. Ved 9pt blir navnet 20pt. */
+  --cv-name-size: calc(var(--cv-font-size) * 20 / 9);
 
   a { color: inherit; text-decoration: none; }
   p { margin: 0 0 3px; }
@@ -22,10 +19,11 @@
   .header { text-align: center; margin-bottom: 7mm; }
   .header h1 {
     margin: 0;
-    font-size: 20pt;
+    font-size: var(--cv-name-size);
     font-weight: 400;
     letter-spacing: 4px;
     text-transform: uppercase;
+    color: var(--cv-accent);
   }
   .header .subtitle { display: block; margin: 3px 0 0; font-style: italic; }
   .identity p { margin: 0; }
@@ -34,17 +32,18 @@
 
   /* Seksjonstittel flyter i venstremargen, innholdet står til høyre */
   section {
-    padding-left: calc(var(--label-width) + var(--label-gap));
-    margin-bottom: 5mm;
+    padding-left: calc(var(--cv-label-width) + var(--cv-label-gap));
+    margin-bottom: var(--cv-section-gap);
   }
   h2 {
     float: left;
-    width: var(--label-width);
-    margin: 0 0 0 calc(-1 * (var(--label-width) + var(--label-gap)));
-    font-size: 9pt;
+    width: var(--cv-label-width);
+    margin: 0 0 0 calc(-1 * (var(--cv-label-width) + var(--cv-label-gap)));
+    font-size: var(--cv-font-size);
     font-weight: 400;
     font-style: italic;
     line-height: 1.3;
+    color: var(--cv-accent);
   }
 
   /* Tittel til venstre, dato til høyre. Hopper til neste linje hvis det ikke er plass. */
@@ -53,11 +52,11 @@
     flex-wrap: wrap;
     align-items: baseline;
     column-gap: 10px;
-    font-size: 9pt;
+    font-size: var(--cv-font-size);
     font-weight: 700;
     margin: 0 0 1px;
   }
-  .entry + .entry h3 { margin-top: 6px; }
+  .entry + .entry h3 { margin-top: var(--cv-entry-gap); }
   h3 .aside { margin-left: auto; font-weight: 400; font-style: italic; }
 
   .stack { margin-bottom: 2px; }
