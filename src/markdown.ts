@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify'
 import MarkdownIt from 'markdown-it'
 import attrs from 'markdown-it-attrs'
 import bracketedSpans from 'markdown-it-bracketed-spans'
@@ -29,6 +30,11 @@ function fencedDivsToHtml(source: string): string {
     .join('\n')
 }
 
+// Rens HTML-en før den vises. html: true trengs fordi fencedDivsToHtml lager <div>-tagger,
+// men det betyr også at en .md-fil fra noen andre kan inneholde <img onerror="..."> eller
+// <script>. markdown-it-attrs slipper i tillegg gjennom vilkårlige attributter ({onclick=...}).
+// DOMPurify fjerner alt som kan kjøre kode, og beholder vanlig HTML, klasser og lenker.
 export function renderMarkdown(source: string): string {
-  return md.render(fencedDivsToHtml(source))
+  const html = md.render(fencedDivsToHtml(source))
+  return DOMPurify.sanitize(html)
 }
