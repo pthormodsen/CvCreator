@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { renderMarkdown } from './markdown'
 import { structureCv, type Layout } from './structure'
 import defaultCv from './defaultCv.md?raw'
+// Samme CV skrevet på to måter: vanlig markdown og Pandoc-syntaks
+import plainCv from './__fixtures__/cv-plain.md?raw'
 import pandocCv from './__fixtures__/cv-pandoc.md?raw'
 
 // Kjør hele kjeden (markdown → HTML → struktur) og gi tilbake et element vi kan spørre i
@@ -32,8 +34,8 @@ function summarize(root: Element) {
 }
 
 describe('vanlig markdown og Pandoc gir samme struktur', () => {
-  it('for hele eksempel-CV-en', () => {
-    const plain = summarize(build(defaultCv))
+  it('for en hel CV (fixtures)', () => {
+    const plain = summarize(build(plainCv))
     const pandoc = summarize(build(pandocCv))
 
     expect(plain).toEqual(pandoc)
@@ -178,9 +180,12 @@ describe('### overskrifter', () => {
   it('med | flytter alt etter streken, også lenker, inn i .aside', () => {
     const cv = build('### Chess | [Live](https://a.no) · [GitHub](https://b.no)\n')
     const h3 = cv.querySelector('h3')!
-    expect(h3.firstChild!.textContent).toBe('Chess')
     expect(texts(cv, 'h3 .aside a')).toEqual(['Live', 'GitHub'])
     expect(h3.textContent).not.toContain('|')
+    // Tittelen uten aside skal være bare "Chess"
+    const title = h3.cloneNode(true) as Element
+    title.querySelector('.aside')!.remove()
+    expect(title.textContent!.trim()).toBe('Chess')
   })
 
   it('beholder | i datoen hvis det står flere', () => {
@@ -208,7 +213,7 @@ describe('teknologilinje (.stack)', () => {
 
 describe('layout', () => {
   it('single beholder rekkefølgen på seksjonene', () => {
-    const cv = build(defaultCv, 'single')
+    const cv = build(plainCv, 'single')
     expect(cv.querySelector('.sidebar')).toBeNull()
     expect(texts(cv, 'section > h2').slice(0, 3)).toEqual([
       'Profil',
@@ -218,10 +223,23 @@ describe('layout', () => {
   })
 
   it('sidebar flytter kontakt og seksjoner med <dl> til sidekolonnen', () => {
-    const cv = build(defaultCv, 'sidebar')
+    const cv = build(plainCv, 'sidebar')
     expect(cv.querySelector('.sidebar > .contact')).not.toBeNull()
     expect(cv.querySelector('.header .contact')).toBeNull()
     expect(texts(cv, '.sidebar section > h2')).toEqual(['Teknisk kompetanse', 'Språk'])
     expect(texts(cv, '.main section > h2')).not.toContain('Språk')
+  })
+})
+
+// Standardteksten nye brukere ser: den skal vise frem alle reglene
+describe('eksempelteksten (defaultCv.md)', () => {
+  it('gir header, kontakt, datoer, teknologilinjer og ferdigheter', () => {
+    const s = summarize(build(defaultCv))
+    expect(s.name).toHaveLength(1)
+    expect(s.subtitle).toHaveLength(1)
+    expect(s.contactLinks.length).toBeGreaterThan(0)
+    expect(s.asides.length).toBeGreaterThan(0)
+    expect(s.stacks.length).toBeGreaterThan(0)
+    expect(s.terms.length).toBeGreaterThan(0)
   })
 })

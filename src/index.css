@@ -1,5 +1,16 @@
 /* Stiler for selve appen (layout og knapper). CV-utseendet ligger i src/themes/. */
 
+:root {
+  --border: #d0d7de;
+  --muted: #59636e;
+  --surface: #f6f8fa;
+  --primary: #1f6feb;
+  --primary-hover: #1a5fcc;
+  --success: #1a7f37;
+  --warning: #9a6700;
+  --danger: #cf222e;
+}
+
 * { box-sizing: border-box; }
 
 html, body, #root { height: 100%; margin: 0; }
@@ -12,34 +23,93 @@ body {
 
 .app { height: 100%; display: flex; flex-direction: column; }
 
-/* Verktøylinje øverst */
-.toolbar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 8px 16px;
-  border-bottom: 1px solid #d0d7de;
-  font-size: 14px;
-}
-.toolbar-title { font-weight: 700; }
-.toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
+/* Elementer som bare vises på bred eller smal skjerm (se media query nederst) */
+.narrow-only { display: none !important; }
 
+/* Felles knappestil */
 .toolbar button,
-.toolbar select {
+.toolbar select,
+.pane-button,
+.segmented button,
+.syntax-help-header button {
   font: inherit;
   padding: 5px 12px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #f6f8fa;
+  background: var(--surface);
   color: inherit;
   cursor: pointer;
 }
-.toolbar button:hover { background: #eef1f4; }
-.toolbar button.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
-.toolbar button.primary:hover { background: #1a5fcc; }
+:is(.toolbar, .pane-header, .syntax-help) button:hover { background: #eef1f4; }
+:is(button, select):focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 
-/* Delt skjerm: to like kolonner som fyller resten av høyden */
+/* ---------- Verktøylinje ---------- */
+
+/* To grupper: filhandlinger til venstre, theme og PDF til høyre */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.toolbar-group { display: flex; align-items: center; gap: 8px; }
+.toolbar-title { font-weight: 700; margin-right: 8px; white-space: nowrap; }
+.toolbar button { white-space: nowrap; }
+
+/* Hovedknappen: større og i farge, så den skiller seg ut */
+.toolbar button.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 16px;
+}
+.toolbar button.primary:hover { background: var(--primary-hover); }
+
+.theme-select { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.theme-select select { color: #1f2328; }
+
+.save-status { margin-left: 4px; font-size: 13px; color: var(--success); cursor: default; white-space: nowrap; }
+.save-status-error { color: var(--warning); }
+
+/* «Mer»-meny og PDF-hint: små bokser som legger seg over innholdet */
+.menu, .pdf-action { position: relative; }
+
+.menu-list,
+.popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  z-index: 10;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.menu-list { left: 0; min-width: 200px; padding: 4px; }
+.toolbar .menu-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  padding: 6px 10px;
+}
+.toolbar .menu-list button:hover { background: var(--surface); }
+
+.popover { right: 0; width: 280px; padding: 12px 14px; }
+.popover p { margin: 0 0 12px; line-height: 1.45; }
+.popover-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Faner: bare på smal skjerm */
+.tabs { display: none; }
+
+/* ---------- Delt skjerm ---------- */
+
+/* To like kolonner som fyller resten av høyden */
 .split {
   flex: 1;
   min-height: 0; /* lar barna scrolle i stedet for å strekke siden */
@@ -47,56 +117,202 @@ body {
   grid-template-columns: 1fr 1fr;
 }
 
+/* Hvert panel: overskrift øverst, innhold som fyller resten */
+.pane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.pane + .pane { border-left: 1px solid var(--border); }
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 41px;
+  padding: 4px 12px 4px 24px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+}
+.pane-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+.pane-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.pane-info { color: var(--muted); white-space: nowrap; }
+.pane-warning { color: var(--danger); cursor: help; }
+.pane-button { padding: 3px 10px; }
+
+/* To knapper som henger sammen (Tilpass | 100 %) */
+.segmented { display: flex; }
+.segmented button { padding: 3px 10px; white-space: nowrap; }
+.segmented button:first-child { border-radius: 6px 0 0 6px; }
+.segmented button:last-child { border-radius: 0 6px 6px 0; border-left: none; }
+.segmented button[aria-pressed="true"] { background: #fff; font-weight: 600; box-shadow: inset 0 -2px 0 var(--primary); }
+
+/* ---------- Editor og jukselapp ---------- */
+
+.editor-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
 .editor {
+  flex: 1;
   width: 100%;
-  height: 100%;
-  padding: 16px;
+  padding: 20px 24px;
   border: none;
-  border-right: 1px solid #d0d7de;
   resize: none;
   outline: none;
-  font-family: ui-monospace, Menlo, Consolas, monospace;
-  font-size: 13px;
-  line-height: 1.5;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1f2328;
   background: #fafbfc;
 }
 
+/* Jukselappen tar øverste del av editoren og scroller selv */
+.syntax-help {
+  max-height: 55%;
+  overflow: auto;
+  padding: 12px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+  font-size: 13px;
+}
+.syntax-help-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.syntax-help-header button { padding: 2px 10px; }
+
+.syntax-rules { margin: 0; display: grid; gap: 10px; }
+.syntax-rule { display: grid; grid-template-columns: 110px 1fr; gap: 12px; }
+.syntax-rule dt { font-weight: 600; padding-top: 6px; }
+.syntax-rule dd { margin: 0; }
+.syntax-rule pre {
+  margin: 0 0 4px;
+  padding: 6px 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.syntax-rule p { margin: 0; color: var(--muted); line-height: 1.45; }
+.syntax-help-note { margin: 12px 0 0; color: var(--muted); line-height: 1.45; }
+.syntax-help-note code { font-size: 12px; }
+
+/* ---------- Forhåndsvisning ---------- */
+
 /* Grå "bordflate" som arket ligger på */
 .preview {
+  flex: 1;
   overflow: auto;
+  scrollbar-gutter: stable; /* fast plass til rullefeltet, så zoom ikke hopper */
   padding: 24px;
   background: #e8eaed;
 }
 
-/* A4-arket. Margen (--page-margin) settes av hvert theme, likt som @page-margen. */
+/* .sheet holder arket og sidelinjene. zoom settes fra Preview.tsx og skalerer begge. */
+.sheet { position: relative; width: 210mm; margin: 0 auto; }
+
+/* A4-arket. Margen (--page-margin) settes av hvert theme. */
 .cv-page {
   width: 210mm;
   min-height: 297mm;
-  margin: 0 auto;
   padding: var(--page-margin, 14mm 16mm);
   background: #fff;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* Stiplet linje der en side slutter i PDF-en */
+.page-break {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed #8c959f;
+  pointer-events: none;
+}
+.page-break span {
+  position: absolute;
+  right: 8px;
+  top: 4px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #8c959f;
+  color: #fff;
+  font: 600 12px/1.5 system-ui, sans-serif;
+}
+
+/* Blokker som ikke får plass og flyttes til neste side (settes av pagination.ts) */
+@media screen {
+  .crosses-page {
+    outline: 2px dashed var(--danger);
+    outline-offset: 2px;
+    border-radius: 2px;
+    background: rgba(207, 34, 46, 0.05);
+  }
+}
+
+/* ---------- Smal skjerm (mobil): faner i stedet for to kolonner ---------- */
+
+@media screen and (max-width: 800px) {
+  .wide-only { display: none !important; }
+  .narrow-only { display: block !important; }
+
+  .toolbar { padding: 8px 12px; }
+  .toolbar-group { gap: 6px; }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .tabs button {
+    flex: 1;
+    padding: 10px;
+    font: inherit;
+    font-size: 15px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .tabs button[aria-selected="true"] { color: #1f2328; font-weight: 600; box-shadow: inset 0 -2px 0 var(--primary); }
+
+  /* Ett panel om gangen */
+  .split { grid-template-columns: 1fr; }
+  .pane + .pane { border-left: none; }
+  .pane.is-inactive { display: none; }
+
+  .pane-header { padding-left: 16px; flex-wrap: wrap; }
+  .editor { padding: 16px; }
+  .syntax-help { padding: 12px 16px; max-height: 60%; }
+  .syntax-rule { grid-template-columns: 1fr; gap: 4px; }
+  .syntax-rule dt { padding-top: 0; }
+  .preview { padding: 12px; }
+}
+
 /* ---------- Utskrift / PDF ---------- */
 
-/* Reserve hvis et theme ikke har sin egen @page */
-@page { size: A4; margin: 14mm 16mm; }
+/* Margin 0 på selve papiret: da har nettleseren ikke plass til topptekst og
+   bunntekst (URL, dato, sidetall), så brukeren slipper å skru dem av.
+   Margen kommer i stedet fra padding på arket, se .cv-page under. */
+@page { size: A4; margin: 0; }
 
 @media print {
-  /* Skjul alt utenom CV-en */
-  .toolbar, .editor { display: none; }
+  /* Skjul alt utenom CV-en (også på mobil når «Skriv»-fanen er valgt) */
+  .toolbar, .tabs, .pane-header, .editor-body, .page-break { display: none !important; }
+  .pane + .pane { border: none; }
 
   /* Fjern høyde- og scroll-begrensninger, ellers blir bare første side med */
   html, body, #root, .app { height: auto; }
-  .split, .preview { display: block; overflow: visible; padding: 0; background: none; }
+  .split, .pane, .preview { display: block !important; overflow: visible; padding: 0; background: none; }
 
-  /* Arket: @page står for margene, så ingen padding, skygge eller fast størrelse her */
+  /* Skaleringen er bare for skjermen. !important slår inline style fra Preview.tsx. */
+  .sheet { zoom: 1 !important; width: auto; }
+
+  /* Arket fyller papiret. Padding = margen fra themet.
+     box-decoration-break: clone gjentar padding øverst og nederst på HVER side,
+     ellers ville side 2 og utover startet helt i kanten av papiret. */
   .cv-page {
     width: auto;
-    min-height: 0;
+    min-height: 0 !important;
     margin: 0;
-    padding: 0;
     box-shadow: none;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 }

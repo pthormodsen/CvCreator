@@ -1,10 +1,8 @@
-/* Modern: sidekolonne med kontaktinfo og ferdigheter, grønnblå aksentfarge */
-
-@page modern { size: A4; margin: 14mm 14mm; }
+/* Modern: sidekolonne med kontaktinfo og ferdigheter, grønnblå aksentfarge.
+   All tekst er minst 9pt. */
 
 .theme-modern {
-  page: modern;
-  --page-margin: 14mm 14mm;
+  --page-margin: 12mm 13mm; /* marg rundt innholdet, både på skjerm og i PDF */
 
   --accent: #0f766e;
   --accent-soft: #e6f2f1;
@@ -12,99 +10,105 @@
   --muted: #64748b;
 
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 9.25pt;
-  line-height: 1.45;
+  font-size: 9pt;
+  line-height: 1.38;
   color: var(--text);
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact; /* behold bakgrunnsfarger i PDF */
 
   a { color: inherit; text-decoration: none; }
-  p { margin: 0 0 5px; }
-  ul { margin: 3px 0 5px; padding-left: 15px; }
-  li { margin: 1px 0; }
+  p { margin: 0 0 3px; }
+  ul { margin: 2px 0 3px; padding-left: 14px; }
+  li { margin: 0; }
   li::marker { color: var(--accent); }
 
   /* Header: farget bånd over hele bredden */
   .header {
     background: var(--accent);
     color: #fff;
-    padding: 9mm 8mm;
-    margin-bottom: 7mm;
+    padding: 6mm 7mm;
+    margin-bottom: 5mm;
     border-radius: 3px;
   }
-  .header h1 { margin: 0; font-size: 25pt; line-height: 1.1; font-weight: 700; letter-spacing: -0.5px; }
+  .header h1 { margin: 0; font-size: 22pt; line-height: 1.1; font-weight: 700; letter-spacing: -0.5px; }
   .header .subtitle {
     display: block;
-    margin: 5px 0 0;
-    font-size: 10pt;
+    margin: 3px 0 0;
+    font-size: 9.5pt;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.2px;
     opacity: 0.85;
   }
 
   /* To kolonner: smal sidekolonne til venstre */
   .columns {
     display: grid;
-    grid-template-columns: 56mm 1fr;
-    gap: 8mm;
+    grid-template-columns: 55mm 1fr;
+    gap: 5mm;
   }
 
   .sidebar {
     background: var(--accent-soft);
-    padding: 5mm;
+    padding: 3.5mm;
     border-radius: 3px;
     align-self: start;
-    font-size: 8.75pt;
 
-    h2 { font-size: 9pt; margin-top: 14px; }
+    h2 { margin-top: 10px; }
     section:first-of-type h2 { margin-top: 0; }
 
     /* Ferdigheter stablet: etikett over verdi */
     dl { margin: 0; }
     dt { font-weight: 600; color: var(--accent); }
-    dd { margin: 0 0 6px; }
+    dd { margin: 0 0 4px; }
   }
 
   /* Kontaktinfo: én lenke per linje, uten skilletegn */
   .contact {
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     overflow-wrap: anywhere;
 
     &::before {
       content: "Kontakt";
       display: block;
-      font-size: 9pt;
+      font-size: 9.5pt;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1.2px;
       color: var(--accent);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
-    a { display: block; margin-bottom: 2px; }
+    a { display: block; margin-bottom: 1px; }
     .sep, br { display: none; }
   }
 
   h2 {
-    font-size: 10.5pt;
+    font-size: 9.5pt;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1.2px;
     color: var(--accent);
-    margin: 0 0 6px;
+    margin: 0 0 4px;
   }
-  .main section + section h2 { margin-top: 14px; }
+  .main section + section h2 { margin-top: 10px; }
 
-  /* Tittel på én linje, dato/lenker under i grått */
-  h3 { font-size: 10pt; font-weight: 650; margin: 8px 0 1px; }
+  /* Tittel til venstre, dato/lenker til høyre. Hopper til neste linje hvis det ikke er plass. */
+  h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 10px;
+    font-size: 9.5pt;
+    font-weight: 650;
+    margin: 6px 0 1px;
+  }
   h3 .aside {
-    display: block;
-    font-size: 8.5pt;
+    margin-left: auto;
     font-weight: 400;
     color: var(--muted);
     a { color: var(--accent); }
   }
 
-  .stack { font-size: 8.5pt; color: var(--accent); font-style: normal; margin-bottom: 3px; }
+  .stack { color: var(--accent); margin-bottom: 2px; }
   .stack em { font-style: normal; }
 
   h2, h3, .stack { break-after: avoid; }

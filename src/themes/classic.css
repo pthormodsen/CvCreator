@@ -1,10 +1,7 @@
 /* Classic: basert på ~/Desktop/Jobbsøking/Cv/style.css */
 
-@page classic { size: A4; margin: 14mm 16mm; }
-
 .theme-classic {
-  page: classic;
-  --page-margin: 14mm 16mm; /* samme som @page over, brukes i forhåndsvisningen */
+  --page-margin: 14mm 16mm; /* marg rundt innholdet, både på skjerm og i PDF */
 
   --accent: #1f4e79;
   --text: #1f2328;

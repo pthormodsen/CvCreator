@@ -143,4 +143,8 @@ Linjeforeningen for dataingeniør og informasjonsteknologi ved HVL.
 
 ## Språk
 
-Norsk (morsmål) · Engelsk (flytende)
+Norsk
+: morsmål
+
+Engelsk
+: flytende

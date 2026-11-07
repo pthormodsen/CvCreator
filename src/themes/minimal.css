@@ -1,60 +1,68 @@
-/* Minimal: svart-hvitt, serif, brede marger og seksjonstitler i egen venstremarg */
-
-@page minimal { size: A4; margin: 20mm 22mm; }
+/* Minimal: svart-hvitt, serif og seksjonstitler i egen venstremarg.
+   All tekst er minst 9pt. */
 
 .theme-minimal {
-  page: minimal;
-  --page-margin: 20mm 22mm;
+  --page-margin: 16mm 18mm; /* marg rundt innholdet, både på skjerm og i PDF */
 
-  --label-width: 34mm; /* bredden på kolonnen med seksjonstitler */
+  --label-width: 26mm; /* bredden på kolonnen med seksjonstitler */
+  --label-gap: 5mm;
 
   font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  font-size: 9.5pt;
-  line-height: 1.55;
+  font-size: 9pt;
+  line-height: 1.4;
   color: #000;
 
   a { color: inherit; text-decoration: none; }
-  p { margin: 0 0 6px; }
-  ul { margin: 0 0 6px; padding-left: 14px; }
-  li { margin: 2px 0; }
+  p { margin: 0 0 3px; }
+  ul { margin: 0 0 3px; padding-left: 12px; }
+  li { margin: 0; }
   li::marker { content: "– "; }
 
-  /* Header sentrert, med mye luft under */
-  .header { text-align: center; margin-bottom: 12mm; }
+  /* Header sentrert, med luft under */
+  .header { text-align: center; margin-bottom: 7mm; }
   .header h1 {
     margin: 0;
-    font-size: 22pt;
+    font-size: 20pt;
     font-weight: 400;
     letter-spacing: 4px;
     text-transform: uppercase;
   }
-  .header .subtitle { display: block; margin: 6px 0 0; font-style: italic; }
+  .header .subtitle { display: block; margin: 3px 0 0; font-style: italic; }
   .identity p { margin: 0; }
-  .contact { margin-top: 8px; font-size: 8.5pt; }
+  .contact { margin-top: 5px; }
   .contact p { margin: 0; }
 
   /* Seksjonstittel flyter i venstremargen, innholdet står til høyre */
   section {
-    padding-left: calc(var(--label-width) + 4mm);
-    margin-bottom: 8mm;
+    padding-left: calc(var(--label-width) + var(--label-gap));
+    margin-bottom: 5mm;
   }
   h2 {
     float: left;
     width: var(--label-width);
-    margin: 1px 0 0 calc(-1 * (var(--label-width) + 4mm));
-    font-size: 7.5pt;
+    margin: 0 0 0 calc(-1 * (var(--label-width) + var(--label-gap)));
+    font-size: 9pt;
     font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-style: italic;
+    line-height: 1.3;
   }
 
-  h3 { font-size: 9.5pt; font-weight: 700; margin: 0 0 1px; }
-  .entry + .entry h3 { margin-top: 10px; }
-  h3 .aside { display: block; font-weight: 400; font-style: italic; }
+  /* Tittel til venstre, dato til høyre. Hopper til neste linje hvis det ikke er plass. */
+  h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 10px;
+    font-size: 9pt;
+    font-weight: 700;
+    margin: 0 0 1px;
+  }
+  .entry + .entry h3 { margin-top: 6px; }
+  h3 .aside { margin-left: auto; font-weight: 400; font-style: italic; }
 
-  .stack { font-size: 8.5pt; margin-bottom: 3px; }
+  .stack { margin-bottom: 2px; }
 
-  dl { display: grid; grid-template-columns: max-content 1fr; column-gap: 14px; row-gap: 2px; margin: 0; }
+  dl { display: grid; grid-template-columns: max-content 1fr; column-gap: 12px; margin: 0; }
   dt { font-style: italic; }
   dd { margin: 0; }
 

@@ -11,10 +11,12 @@ export function load(key: string, fallback: string): string {
   }
 }
 
-export function save(key: string, value: string) {
+// Returnerer true hvis lagringen lyktes, så appen kan vise det til brukeren
+export function save(key: string, value: string): boolean {
   try {
     localStorage.setItem(PREFIX + key, value)
+    return true
   } catch {
-    // Ignorer: appen virker fortsatt, den husker bare ikke teksten
+    return false
   }
 }
