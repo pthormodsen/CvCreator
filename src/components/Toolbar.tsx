@@ -82,11 +82,11 @@ export function Toolbar({
           onChange={handleFile}
           hidden
         />
-        <button className="wide-only" onClick={openFilePicker}>
+        <button className="btn btn-ghost wide-only" onClick={openFilePicker}>
           <FolderOpen size={ICON} aria-hidden="true" />
           Open
         </button>
-        <button className="wide-only" onClick={downloadMarkdown}>
+        <button className="btn btn-ghost wide-only" onClick={downloadMarkdown}>
           <Save size={ICON} aria-hidden="true" />
           Save as file
         </button>
@@ -130,7 +130,7 @@ export function Toolbar({
         <ThemePicker name="toolbar-theme" themeId={themeId} onChange={onThemeChange} />
 
         <div className="pdf-action" ref={pdfRef}>
-          <button className="primary" onClick={handlePdfClick}>
+          <button className="btn btn-primary" onClick={handlePdfClick}>
             <FileDown size={ICON} aria-hidden="true" />
             <span>
               <span className="wide-only">Download </span>PDF
@@ -143,8 +143,8 @@ export function Toolbar({
                 as the destination.
               </p>
               <div className="popover-actions">
-                <button onClick={closePdfHint}>Cancel</button>
-                <button className="primary" autoFocus onClick={confirmPdf}>
+                <button className="btn btn-secondary" onClick={closePdfHint}>Cancel</button>
+                <button className="btn btn-primary" autoFocus onClick={confirmPdf}>
                   Open print dialog
                 </button>
               </div>

@@ -80,6 +80,7 @@ export function Preview({ markdown, settings, theme, inactive }: PreviewProps) {
         {/* På mobil står «Preview» allerede i fanen, så tittelen skjules der */}
         <span className="pane-title wide-only">Preview</span>
         <div className="pane-actions">
+          <span className="paper-size wide-only">A4 · 210 × 297 mm</span>
           <span className="pane-info">
             {pages} {pages === 1 ? 'page' : 'pages'}
             {pagination && pagination.moved > 0 && (
@@ -93,10 +94,10 @@ export function Preview({ markdown, settings, theme, inactive }: PreviewProps) {
             )}
           </span>
           <div className="segmented" role="group" aria-label="Zoom">
-            <button aria-pressed={fit} onClick={() => setFit(true)}>
+            <button className="segmented-option" aria-pressed={fit} onClick={() => setFit(true)}>
               Fit{fit && fitScale < 1 ? ` ${Math.round(fitScale * 100)}%` : ''}
             </button>
-            <button aria-pressed={!fit} onClick={() => setFit(false)}>
+            <button className="segmented-option" aria-pressed={!fit} onClick={() => setFit(false)}>
               100%
             </button>
           </div>
@@ -116,6 +117,10 @@ export function Preview({ markdown, settings, theme, inactive }: PreviewProps) {
             style={{ ...variables, minHeight: pagination?.sheetHeight }}
             dangerouslySetInnerHTML={{ __html: html }}
           />
+          {/* Beskjæringsmerker i hjørnene. Bare på skjerm, ikke i PDF-en. */}
+          {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => (
+            <span key={corner} className={`crop-mark ${corner}`} aria-hidden="true" />
+          ))}
           {/* Stiplet linje der hver side slutter i PDF-en */}
           {pagination?.breaks.map((y, i) => (
             <div key={i} className="page-break" style={{ top: y }} aria-hidden="true">

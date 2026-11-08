@@ -9,19 +9,20 @@ import { splitFrontMatter } from '../settings'
 import { minimalChange } from '../textDiff'
 
 // Fargene for markdown. lang-markdown gir hver del av teksten en "tag",
-// og her bestemmer vi hvordan hver tag ser ut.
+// og her bestemmer vi hvordan hver tag ser ut. Fargene er tokens fra tokens.css,
+// så de følger lys og mørk modus.
 const markdownHighlight = HighlightStyle.define([
   // Overskrifter: tydelige
-  { tag: [tags.heading1, tags.heading2, tags.heading3, tags.heading4], color: '#0b3d91', fontWeight: '700' },
+  { tag: [tags.heading1, tags.heading2, tags.heading3, tags.heading4], color: 'var(--color-md-heading)', fontWeight: '600' },
   // **fet** og *kursiv*
-  { tag: tags.strong, fontWeight: '700' },
+  { tag: tags.strong, fontWeight: '600' },
   { tag: tags.emphasis, fontStyle: 'italic' },
   // [lenketekst] i blått, (https://...) i dempet grått, så kontaktlinjene blir roligere
-  { tag: tags.link, color: '#0550ae' },
-  { tag: tags.url, color: '#8c959f' },
+  { tag: tags.link, color: 'var(--color-md-link)' },
+  { tag: tags.url, color: 'var(--color-md-url)' },
   // Selve markdown-tegnene: # ** [ ] ( ) - \ og lignende
-  { tag: tags.processingInstruction, color: '#8c959f' },
-  { tag: tags.monospace, color: '#953800' },
+  { tag: tags.processingInstruction, color: 'var(--color-md-mark)' },
+  { tag: tags.monospace, color: 'var(--color-md-code)' },
 ])
 
 // Front matter (innstillingene mellom --- øverst) vises dempet, så den ikke konkurrerer
@@ -47,19 +48,23 @@ const frontMatterField = StateField.define<DecorationSet>({
 
 // Utseendet på editoren: samme skrift, linjehøyde og luft som textarea-en hadde
 const editorTheme = EditorView.theme({
-  '&': { height: '100%', fontSize: '14px', backgroundColor: '#fafbfc', color: '#1f2328' },
+  '&': { height: '100%', fontSize: '13.5px', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' },
   '&.cm-focused': { outline: 'none' },
   '.cm-scroller': {
-    fontFamily: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
-    lineHeight: '1.6',
+    fontFamily: 'var(--font-mono)',
+    lineHeight: '1.7',
   },
-  '.cm-content': { padding: '20px 0', caretColor: '#1f2328' },
+  '.cm-content': { padding: '16px 0 24px', caretColor: 'var(--color-accent)' },
+  '.cm-cursor': { borderLeftColor: 'var(--color-accent)', borderLeftWidth: '2px' },
+  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection': {
+    backgroundColor: 'var(--color-accent-soft) !important',
+  },
   // --editor-gutter settes i index.css, så luften kan være mindre på mobil
   '.cm-line': { padding: '0 var(--editor-gutter, 24px)' },
-  '.cm-placeholder': { color: '#8c959f' },
+  '.cm-placeholder': { color: 'var(--color-text-subtle)' },
   // Dempet front matter: grå og uten fet/farget markdown-utheving inni
-  '.cm-frontmatter, .cm-frontmatter *': { color: '#8c959f !important', fontWeight: '400 !important' },
-  '.cm-frontmatter': { backgroundColor: '#f2f4f6' },
+  '.cm-frontmatter, .cm-frontmatter *': { color: 'var(--color-text-muted) !important', fontWeight: '400 !important' },
+  '.cm-frontmatter': { backgroundColor: 'var(--color-bg)' },
 })
 
 // Det andre komponenter kan be editoren om (Customize-panelet bruker undo/redo,

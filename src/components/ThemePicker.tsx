@@ -58,9 +58,9 @@ type ThemePickerProps = {
 // skjermleserstøtte fra nettleseren uten ekstra kode.
 export function ThemePicker({ themeId, onChange, name }: ThemePickerProps) {
   return (
-    <div className="theme-picker" role="radiogroup" aria-label="Theme">
+    <div className="segmented theme-picker" role="radiogroup" aria-label="Theme">
       {themes.map((theme) => (
-        <label key={theme.id} className="theme-option" title={theme.name}>
+        <label key={theme.id} className="segmented-option" title={theme.name}>
           <input
             type="radio"
             name={name}

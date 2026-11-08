@@ -12,7 +12,7 @@ export function SyntaxHelp({ onClose }: SyntaxHelpProps) {
     <aside className="syntax-help" aria-label="Syntax">
       <div className="syntax-help-header">
         <strong>How to write your CV</strong>
-        <button onClick={onClose}>
+        <button className="btn btn-ghost btn-sm" onClick={onClose}>
           <X size={14} aria-hidden="true" />
           Close
         </button>

@@ -30,7 +30,7 @@ export function MoreMenu({ items }: MoreMenuProps) {
 
   return (
     <div className="menu" ref={ref}>
-      <button aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)}>
+      <button className="btn btn-ghost" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)}>
         More
         <ChevronDown size={14} aria-hidden="true" />
       </button>
@@ -40,7 +40,7 @@ export function MoreMenu({ items }: MoreMenuProps) {
             <button
               key={item.label}
               role="menuitem"
-              className={item.className}
+              className={`menu-item ${item.className ?? ""}`}
               onClick={() => {
                 setOpen(false)
                 item.onSelect()

@@ -63,7 +63,7 @@ export function Editor(props: EditorProps) {
           </button>
         </div>
         {view === 'markdown' && (
-          <button className="pane-button" aria-expanded={showHelp} onClick={() => setShowHelp(!showHelp)}>
+          <button className="btn btn-ghost btn-sm" aria-expanded={showHelp} onClick={() => setShowHelp(!showHelp)}>
             <CircleHelp size={14} aria-hidden="true" />
             Syntax
           </button>

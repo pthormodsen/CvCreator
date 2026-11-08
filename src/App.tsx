@@ -130,15 +130,17 @@ export default function App() {
         onPrint={handlePrint}
       />
       {/* Faner, bare synlige på smal skjerm (se .tabs i index.css) */}
-      <nav className="tabs" role="tablist">
-        <button role="tab" aria-selected={tab === 'write'} onClick={() => setTab('write')}>
-          <Pencil size={16} aria-hidden="true" />
-          Write
-        </button>
-        <button role="tab" aria-selected={tab === 'preview'} onClick={() => setTab('preview')}>
-          <Eye size={16} aria-hidden="true" />
-          Preview
-        </button>
+      <nav className="tabs">
+        <div className="segmented" role="tablist">
+          <button className="segmented-option" role="tab" aria-selected={tab === 'write'} onClick={() => setTab('write')}>
+            <Pencil size={15} aria-hidden="true" />
+            Write
+          </button>
+          <button className="segmented-option" role="tab" aria-selected={tab === 'preview'} onClick={() => setTab('preview')}>
+            <Eye size={15} aria-hidden="true" />
+            Preview
+          </button>
+        </div>
       </nav>
       {/* --split styrer kolonnebredden i CSS, så mobil-layouten fortsatt kan overstyre den */}
       <main className="split" style={{ '--split': `${split * 100}%` } as CSSProperties}>

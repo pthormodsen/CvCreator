@@ -1,0 +1,166 @@
+/* Design-systemet for app-UI-et (Resumark · Press). Alt i index.css bruker bare disse variablene.
+   CV-arket har sine egne variabler (--cv-*) i src/themes/ og er alltid lyst. */
+
+:root {
+  /* ---------- Farger: lys modus ---------- */
+  --color-bg: #eff0f3; /* arbeidsflaten bak panelene */
+  --color-surface: #ffffff; /* panel, meny, dialog */
+  --color-surface-raised: #ffffff; /* popover og dialog */
+  --color-canvas: #f5f6f8; /* bordflaten arket ligger på */
+  --color-segment-track: #e4e6eb; /* sporet i segmenterte kontroller */
+  --color-segment-thumb: #ffffff; /* valgt knapp i segmenterte kontroller */
+  --color-text: #14161c;
+  --color-text-muted: #5f6470;
+  --color-text-subtle: #8a8f9b;
+  --color-border: #e5e7ec;
+  --color-border-strong: #d3d6dd;
+  --color-hover: rgba(20, 22, 28, 0.055);
+  --color-pressed: rgba(20, 22, 28, 0.1);
+
+  --color-accent: #1f3fd1;
+  --color-accent-hover: #1a36b8;
+  --color-accent-active: #162e9e;
+  --color-accent-text: #1f3fd1; /* aksent som tekst på panelflate */
+  --color-accent-soft: #eef1ff;
+  --color-accent-soft-border: #d9e0ff;
+  --color-on-accent: #ffffff;
+  --color-focus: rgba(31, 63, 209, 0.45);
+
+  --color-success: #1a8f5a;
+  --color-warning-bg: #fff7d6;
+  --color-warning-border: #f0d78a;
+  --color-warning-text: #6b4e00;
+  --color-danger: #c8232c;
+  --color-danger-hover: #ad1d25;
+  --color-danger-soft: rgba(200, 35, 44, 0.06);
+
+  --color-inverse: #14161c; /* toast */
+  --color-on-inverse: #f7f8fa;
+  --color-inverse-accent: #aebcff;
+  --color-backdrop: rgba(14, 16, 22, 0.32);
+  --color-crop: #a9aebb; /* beskjæringsmerker rundt arket */
+  --color-page-break: #8c919c;
+
+  /* Markdown i editoren */
+  --color-md-heading: #1f3fd1;
+  --color-md-mark: #a9adb8;
+  --color-md-link: #1f3fd1;
+  --color-md-url: #9a9fab;
+  --color-md-code: #a1450f;
+
+  /* ---------- Typografi ---------- */
+  --font-ui: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 26px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+
+  /* ---------- Luft ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ---------- Form ---------- */
+  --radius-sm: 4px; /* små detaljer: kode, merkelapper */
+  --radius: 8px; /* knapper, felt, menyelementer */
+  --radius-lg: 12px; /* paneler, menyer, dialoger */
+  --radius-full: 999px;
+  --control-h: 32px;
+  --control-h-sm: 28px;
+
+  /* ---------- Skygger ---------- */
+  --shadow-xs: 0 1px 2px rgba(16, 20, 32, 0.06);
+  --shadow-sm: 0 1px 2px rgba(16, 20, 32, 0.04), 0 1px 3px rgba(16, 20, 32, 0.04);
+  --shadow-thumb: 0 1px 2px rgba(16, 20, 32, 0.12), 0 0 0 0.5px rgba(16, 20, 32, 0.04);
+  --shadow-md: 0 0 0 1px rgba(16, 20, 32, 0.06), 0 8px 24px rgba(16, 20, 32, 0.12);
+  --shadow-lg: 0 0 0 1px rgba(16, 20, 32, 0.06), 0 24px 56px rgba(16, 20, 32, 0.2);
+  --shadow-sheet: 0 0 0 1px rgba(16, 20, 32, 0.06), 0 10px 28px rgba(16, 20, 32, 0.08);
+  --shadow-primary: 0 1px 2px rgba(20, 40, 160, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  /* ---------- Bevegelse ---------- */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration: 180ms;
+  --duration-slow: 260ms;
+
+  color-scheme: light;
+}
+
+/* ---------- Mørk modus: følger systemet ---------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0d0e12;
+    --color-surface: #16181d;
+    --color-surface-raised: #1c1e24;
+    --color-canvas: #101115;
+    --color-segment-track: #1b1d23;
+    --color-segment-thumb: #2d3039;
+    --color-text: #eceef2;
+    --color-text-muted: #9ca1ad;
+    --color-text-subtle: #6f7480;
+    --color-border: #25282f;
+    --color-border-strong: #343842;
+    --color-hover: rgba(255, 255, 255, 0.06);
+    --color-pressed: rgba(255, 255, 255, 0.1);
+
+    --color-accent: #4d6bff;
+    --color-accent-hover: #6280ff;
+    --color-accent-active: #3f5cf0;
+    --color-accent-text: #9fb0ff;
+    --color-accent-soft: #181d36;
+    --color-accent-soft-border: #2b3466;
+    --color-on-accent: #ffffff;
+    --color-focus: rgba(120, 145, 255, 0.6);
+
+    --color-success: #3ccf8e;
+    --color-warning-bg: #2a2310;
+    --color-warning-border: #5c4a17;
+    --color-warning-text: #f2d48a;
+    --color-danger: #ff5c63;
+    --color-danger-hover: #ff767c;
+    --color-danger-soft: rgba(255, 92, 99, 0.1);
+
+    --color-inverse: #f2f3f6;
+    --color-on-inverse: #14161c;
+    --color-inverse-accent: #1f3fd1;
+    --color-backdrop: rgba(0, 0, 0, 0.55);
+    --color-crop: #3b3f4a;
+    --color-page-break: #6f7480;
+
+    --color-md-heading: #a5b4ff;
+    --color-md-mark: #555a66;
+    --color-md-link: #8fa2ff;
+    --color-md-url: #626774;
+    --color-md-code: #f0a36b;
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-thumb: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --shadow-md: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 12px 32px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 24px 64px rgba(0, 0, 0, 0.6);
+    --shadow-sheet: 0 12px 32px rgba(0, 0, 0, 0.5);
+    --shadow-primary: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration: 0ms;
+    --duration-slow: 0ms;
+  }
+}
