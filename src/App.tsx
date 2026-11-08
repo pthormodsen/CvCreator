@@ -11,6 +11,7 @@ import { parseCv, updateFrontMatter } from './settings'
 import { effectiveValues } from './cvStyle'
 import { fontsReadyFor } from './fonts'
 import defaultCv from './defaultCv.md?raw'
+import { exampleCv } from './example'
 
 // Startteksten. Tidligere lå valgt theme i localStorage. Nå står det i front matter
 // (theme: modern), så det følger med filen. Et gammelt valg flyttes over én gang.
@@ -53,9 +54,9 @@ export default function App() {
     setSaved(save('markdown', text))
   }
 
-  // Theme lagres i front matter. Classic er standard, så da fjernes nøkkelen.
+  // Theme lagres i front matter, så det følger med filen
   function updateTheme(id: string) {
-    updateMarkdown(updateFrontMatter(markdown, ['theme'], id === 'classic' ? undefined : id))
+    updateMarkdown(updateFrontMatter(markdown, ['theme'], id))
   }
 
   // Customize-panelet: sett eller fjern (undefined) én innstilling i front matter
@@ -73,7 +74,7 @@ export default function App() {
 
   // Spør før vi erstatter tekst brukeren har skrevet selv
   function confirmReplace(message: string): boolean {
-    const untouched = markdown.trim() === '' || markdown === defaultCv
+    const untouched = markdown.trim() === '' || markdown === defaultCv || markdown === exampleCv(theme.id)
     return untouched || window.confirm(message)
   }
 
@@ -89,7 +90,7 @@ export default function App() {
         'Replace your text with the example CV? What you have written will be lost. Use “Save as file” first if you want to keep it.',
       )
     ) {
-      updateMarkdown(defaultCv)
+      updateMarkdown(exampleCv(theme.id))
     }
   }
 
