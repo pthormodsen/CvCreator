@@ -78,6 +78,11 @@ export function Editor(props: EditorProps) {
                 <li key={warning}>{warning}</li>
               ))}
             </ul>
+            {view === 'markdown' && (
+              <button type="button" className="link-button" onClick={() => editorRef.current?.showSettings()}>
+                Show settings
+              </button>
+            )}
           </div>
         )}
         {view === 'customize' && (

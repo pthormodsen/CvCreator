@@ -1,6 +1,6 @@
 import { useEffect, useImperativeHandle, useRef, type Ref } from 'react'
-import { EditorState, RangeSetBuilder, StateField, type Text } from '@codemirror/state'
-import { Decoration, EditorView, keymap, placeholder, type DecorationSet } from '@codemirror/view'
+import { EditorSelection, EditorState, StateEffect, StateField, type Text } from '@codemirror/state'
+import { Decoration, EditorView, WidgetType, keymap, placeholder, type DecorationSet } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, isolateHistory, redo, undo } from '@codemirror/commands'
 import { HighlightStyle, LanguageSupport, syntaxHighlighting } from '@codemirror/language'
 import { commonmarkLanguage } from '@codemirror/lang-markdown'
@@ -25,25 +25,104 @@ const markdownHighlight = HighlightStyle.define([
   { tag: tags.monospace, color: 'var(--color-md-code)' },
 ])
 
-// Front matter (innstillingene mellom --- øverst) vises dempet, så den ikke konkurrerer
-// med CV-teksten. Vi markerer linjene med klassen cm-frontmatter (se editorTheme under).
-const frontMatterLine = Decoration.line({ class: 'cm-frontmatter' })
+// ---------- Front matter som «⚙ Settings»-pille ----------
+//
+// Innstillingene mellom --- øverst er foldet sammen til én linje som standard, så CV-teksten
+// står først. Et klikk på pillen viser linjene igjen (dempet), et nytt klikk folder dem.
 
-function frontMatterDecorations(doc: Text): DecorationSet {
-  const builder = new RangeSetBuilder<Decoration>()
-  const { frontMatter, body } = splitFrontMatter(doc.toString())
-  if (frontMatter !== null) {
-    const end = doc.length - body.length // der front matter slutter
-    const lastLine = doc.lineAt(Math.max(0, end - 1)).number
-    for (let n = 1; n <= lastLine; n++) builder.add(doc.line(n).from, doc.line(n).from, frontMatterLine)
-  }
-  return builder.finish()
+const toggleSettings = StateEffect.define<boolean>() // true = vis linjene
+
+type SettingsState = { expanded: boolean; end: number; decorations: DecorationSet }
+
+// Kort sammendrag til pillen: «theme: modern +3»
+function settingsSummary(frontMatter: string): string {
+  const keys = [...frontMatter.matchAll(/^([A-Za-z][\w-]*):[ \t]*(.*)$/gm)]
+  if (keys.length === 0) return 'none yet'
+  const theme = keys.find((k) => k[1] === 'theme')
+  const first = theme ?? keys[0]
+  const value = first[2].trim()
+  const label = value && value.length <= 24 ? `${first[1]}: ${value}` : first[1]
+  return keys.length > 1 ? `${label}  +${keys.length - 1}` : label
 }
 
-const frontMatterField = StateField.define<DecorationSet>({
-  create: (state) => frontMatterDecorations(state.doc),
-  update: (decorations, tr) => (tr.docChanged ? frontMatterDecorations(tr.state.doc) : decorations),
-  provide: (field) => EditorView.decorations.from(field),
+class SettingsPill extends WidgetType {
+  readonly summary: string
+  readonly expanded: boolean
+  constructor(summary: string, expanded: boolean) {
+    super()
+    this.summary = summary
+    this.expanded = expanded
+  }
+  eq(other: SettingsPill) {
+    return other.summary === this.summary && other.expanded === this.expanded
+  }
+  toDOM(view: EditorView) {
+    const line = document.createElement('div')
+    line.className = 'cm-settings-pill-line'
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.className = 'cm-settings-pill'
+    button.setAttribute('aria-expanded', String(this.expanded))
+    button.title = this.expanded ? 'Hide the settings lines' : 'Show the settings lines (front matter)'
+    button.innerHTML =
+      `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>` +
+      `<strong>Settings</strong><span class="cm-settings-summary"></span>` +
+      `<svg class="cm-settings-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`
+    button.querySelector('.cm-settings-summary')!.textContent = `· ${this.summary}`
+    button.addEventListener('mousedown', (e) => e.preventDefault()) // ikke flytt markøren
+    button.addEventListener('click', () => view.dispatch({ effects: toggleSettings.of(!this.expanded) }))
+    line.append(button)
+    return line
+  }
+  ignoreEvent() {
+    return true // editoren skal ikke reagere på klikk i pillen
+  }
+}
+
+const frontMatterLine = Decoration.line({ class: 'cm-frontmatter' })
+
+function buildSettings(doc: Text, expanded: boolean): SettingsState {
+  const { frontMatter, body } = splitFrontMatter(doc.toString())
+  if (frontMatter === null) return { expanded, end: -1, decorations: Decoration.none }
+  const end = doc.lineAt(Math.max(0, doc.length - body.length - 1)).to // slutten av linjen med ---
+  const pill = new SettingsPill(settingsSummary(frontMatter), expanded)
+  if (!expanded) {
+    return { expanded, end, decorations: Decoration.set([Decoration.replace({ widget: pill, block: true }).range(0, end)]) }
+  }
+  const ranges = [Decoration.widget({ widget: pill, block: true, side: -1 }).range(0)]
+  for (let n = 1; n <= doc.lineAt(end).number; n++) ranges.push(frontMatterLine.range(doc.line(n).from))
+  return { expanded, end, decorations: Decoration.set(ranges, true) }
+}
+
+const settingsField = StateField.define<SettingsState>({
+  create: (state) => buildSettings(state.doc, false),
+  update(value, tr) {
+    let expanded = value.expanded
+    for (const effect of tr.effects) if (effect.is(toggleSettings)) expanded = effect.value
+    if (!tr.docChanged && expanded === value.expanded) return value
+    return buildSettings(tr.state.doc, expanded)
+  },
+  provide: (field) => [
+    EditorView.decorations.from(field, (value) => value.decorations),
+    // Markøren hopper over den foldede blokken i stedet for å havne inni den
+    EditorView.atomicRanges.of((view) => {
+      const value = view.state.field(field)
+      return value.expanded ? Decoration.none : value.decorations
+    }),
+  ],
+})
+
+// En tom markør i starten av den foldede blokken ville skrevet tekst foran ---, og da
+// sluttet front matter å fungere. Flytt den til første linje etter blokken.
+const keepCursorOutOfSettings = EditorState.transactionFilter.of((tr) => {
+  if (!tr.selection) return tr
+  const value = tr.state.field(settingsField, false)
+  const after = tr.docChanged ? buildSettings(tr.newDoc, value?.expanded ?? false) : value
+  if (!after || after.expanded || after.end < 0) return tr
+  const main = tr.selection.main
+  if (!main.empty || main.head > after.end) return tr
+  const target = Math.min(after.end + 1, tr.newDoc.length)
+  return [tr, { selection: EditorSelection.cursor(target), sequential: true }]
 })
 
 // Utseendet på editoren: samme skrift, linjehøyde og luft som textarea-en hadde
@@ -62,14 +141,14 @@ const editorTheme = EditorView.theme({
   // --editor-gutter settes i index.css, så luften kan være mindre på mobil
   '.cm-line': { padding: '0 var(--editor-gutter, 24px)' },
   '.cm-placeholder': { color: 'var(--color-text-subtle)' },
-  // Dempet front matter: grå og uten fet/farget markdown-utheving inni
+  // Utbrettet front matter: dempet og uten fet/farget markdown-utheving inni
   '.cm-frontmatter, .cm-frontmatter *': { color: 'var(--color-text-muted) !important', fontWeight: '400 !important' },
   '.cm-frontmatter': { backgroundColor: 'var(--color-bg)' },
 })
 
 // Det andre komponenter kan be editoren om (Customize-panelet bruker undo/redo,
 // så Cmd+Z virker der også, med samme historikk som editoren)
-export type EditorController = { undo: () => void; redo: () => void }
+export type EditorController = { undo: () => void; redo: () => void; showSettings: () => void }
 
 type MarkdownEditorProps = {
   value: string
@@ -98,6 +177,10 @@ export function MarkdownEditor({ value, onChange, labelledBy, hidden, ref }: Mar
       parent: hostRef.current!,
       state: EditorState.create({
         doc: initialValue.current,
+        // Start markøren på første linje etter innstillingene (de er foldet sammen)
+        selection: EditorSelection.cursor(
+          initialValue.current.length - splitFrontMatter(initialValue.current).body.length,
+        ),
         extensions: [
           history(),
           keymap.of([...defaultKeymap, ...historyKeymap]),
@@ -108,7 +191,8 @@ export function MarkdownEditor({ value, onChange, labelledBy, hidden, ref }: Mar
           //   så de fikk URL-fargen i stedet for lenkefargen
           new LanguageSupport(commonmarkLanguage),
           syntaxHighlighting(markdownHighlight),
-          frontMatterField,
+          settingsField,
+          keepCursorOutOfSettings,
           editorTheme,
           EditorView.lineWrapping,
           placeholder('Write your CV in Markdown…'),
@@ -147,6 +231,7 @@ export function MarkdownEditor({ value, onChange, labelledBy, hidden, ref }: Mar
   useImperativeHandle(ref, () => ({
     undo: () => viewRef.current && undo(viewRef.current),
     redo: () => viewRef.current && redo(viewRef.current),
+    showSettings: () => viewRef.current?.dispatch({ effects: toggleSettings.of(true) }),
   }))
 
   return <div className={hidden ? 'editor-host is-hidden' : 'editor-host'} ref={hostRef} />
