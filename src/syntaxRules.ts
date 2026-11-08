@@ -14,7 +14,7 @@ export type SyntaxRule = {
 export const syntaxRules: SyntaxRule[] = [
   {
     title: 'Settings',
-    example: '---\ntheme: modern\naccent: "#0f766e"\nfont: Inter\nlabels:\n  contact: Contact\n---',
+    example: '---\ntheme: modern\naccent: "#7c3aed"\nfont: Inter\nlabels:\n  contact: Get in touch\n---',
     result:
       'Optional block at the very top, between two --- lines. It is never shown in the CV. The Customize tab writes here too. All settings are listed below.',
     settings: true,

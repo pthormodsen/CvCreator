@@ -29,3 +29,31 @@ export function cvVariables(theme: Theme, settings: Settings): Record<string, st
   }
   return variables
 }
+
+// Hvilke verdier som faktisk avviker fra themets standard. En nøkkel i front matter
+// med samme verdi som standarden (f.eks. font-size: 9.5pt i Classic) regnes ikke som endret.
+export type Modified = Record<'accent' | 'font' | 'fontSize' | 'lineHeight' | 'margins' | 'sectionGap' | 'entryGap' | 'contact', boolean>
+
+export function modifiedFields(theme: Theme, settings: Settings): Modified {
+  const d = theme.defaults
+  const v = effectiveValues(theme, settings)
+  // Lengder kan være regnet om fra cm/pt/px, så små avrundingsforskjeller teller ikke
+  const differs = (a: number, b: number) => Math.abs(a - b) > 1e-6
+  return {
+    accent: normalizeColor(v.accent) !== normalizeColor(d.accent),
+    font: v.font !== d.font,
+    fontSize: differs(v.fontSize, d.fontSize),
+    lineHeight: differs(v.lineHeight, d.lineHeight),
+    margins: differs(v.margins.y, d.margins.y) || differs(v.margins.x, d.margins.x),
+    sectionGap: differs(v.sectionGap, d.sectionGap),
+    entryGap: differs(v.entryGap, d.entryGap),
+    contact: v.labels.contact !== d.labels.contact,
+  }
+}
+
+// #ABC og #aabbcc er samme farge
+function normalizeColor(color: string): string {
+  const c = color.trim().toLowerCase()
+  const short = c.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/)
+  return short ? `#${short[1]}${short[1]}${short[2]}${short[2]}${short[3]}${short[3]}` : c
+}

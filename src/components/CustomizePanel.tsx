@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { RotateCcw, TriangleAlert } from 'lucide-react'
 import type { Settings } from '../settings'
 import type { Theme } from '../themes'
-import { effectiveValues } from '../cvStyle'
+import { effectiveValues, modifiedFields } from '../cvStyle'
 import { findFont, fontOptions } from '../fonts'
 import { renderMarkdown } from '../markdown'
 import { structureCv } from '../structure'
@@ -31,6 +31,8 @@ export function CustomizePanel({
 }: CustomizePanelProps) {
   const defaults = theme.defaults
   const current = effectiveValues(theme, settings)
+  // Bare verdier som avviker fra themets standard vises som endret (med tilbakestill-knapp)
+  const modified = modifiedFields(theme, settings)
 
   // Tall: lik standard (innenfor et halvt steg) → fjern, ellers skriv med enhet
   function setNumber(path: string[], value: number, standard: number, step: number, unit = '') {
@@ -75,16 +77,12 @@ export function CustomizePanel({
     onSet(['sidebar'], sameAsAutomatic ? undefined : next)
   }
 
-  const anyStyleSet =
-    settings.accent !== undefined ||
-    settings.font !== undefined ||
-    settings.fontSize !== undefined ||
-    settings.lineHeight !== undefined ||
-    settings.margins !== undefined ||
-    settings.sectionGap !== undefined ||
-    settings.entryGap !== undefined ||
-    settings.labels !== undefined ||
-    settings.sidebar !== undefined
+  // Egne valg for sidekolonnen teller bare hvis de gir noe annet enn det automatiske
+  const sidebarModified =
+    settings.sidebar !== undefined &&
+    (sections.inSidebar.length !== sections.automatic.length ||
+      sections.inSidebar.some((h) => !sections.automatic.includes(h)))
+  const anyModified = Object.values(modified).some(Boolean) || sidebarModified
 
   return (
     <div className="customize">
@@ -105,7 +103,7 @@ export function CustomizePanel({
           <Field
             label="Accent color"
             htmlFor="c-accent"
-            modified={settings.accent !== undefined}
+            modified={modified.accent}
             onReset={() => onSet(['accent'], undefined)}
             value={current.accent}
           >
@@ -122,7 +120,7 @@ export function CustomizePanel({
           <Field
             label="Font"
             htmlFor="c-font"
-            modified={settings.font !== undefined}
+            modified={modified.font}
             onReset={() => {
               setCustomFont(false)
               onSet(['font'], undefined)
@@ -175,7 +173,7 @@ export function CustomizePanel({
             max={13}
             step={0.25}
             unit="pt"
-            modified={settings.fontSize !== undefined}
+            modified={modified.fontSize}
             onChange={(v) => setNumber(['font-size'], v, defaults.fontSize, 0.25, 'pt')}
             onReset={() => onSet(['font-size'], undefined)}
           />
@@ -186,7 +184,7 @@ export function CustomizePanel({
             min={1.1}
             max={1.8}
             step={0.05}
-            modified={settings.lineHeight !== undefined}
+            modified={modified.lineHeight}
             onChange={(v) => setNumber(['line-height'], v, defaults.lineHeight, 0.05)}
             onReset={() => onSet(['line-height'], undefined)}
           />
@@ -201,7 +199,7 @@ export function CustomizePanel({
             max={35}
             step={1}
             unit="mm"
-            modified={settings.margins !== undefined}
+            modified={modified.margins}
             onChange={(v) => setMargins(v, current.margins.x)}
             onReset={() => onSet(['margins'], undefined)}
           />
@@ -213,7 +211,7 @@ export function CustomizePanel({
             max={35}
             step={1}
             unit="mm"
-            modified={settings.margins !== undefined}
+            modified={modified.margins}
             onChange={(v) => setMargins(current.margins.y, v)}
             onReset={() => onSet(['margins'], undefined)}
           />
@@ -225,7 +223,7 @@ export function CustomizePanel({
             max={12}
             step={0.5}
             unit="mm"
-            modified={settings.sectionGap !== undefined}
+            modified={modified.sectionGap}
             onChange={(v) => setNumber(['section-gap'], v, defaults.sectionGap, 0.5, 'mm')}
             onReset={() => onSet(['section-gap'], undefined)}
           />
@@ -237,7 +235,7 @@ export function CustomizePanel({
             max={8}
             step={0.5}
             unit="mm"
-            modified={settings.entryGap !== undefined}
+            modified={modified.entryGap}
             onChange={(v) => setNumber(['entry-gap'], v, defaults.entryGap, 0.5, 'mm')}
             onReset={() => onSet(['entry-gap'], undefined)}
           />
@@ -248,7 +246,7 @@ export function CustomizePanel({
             label="Contact heading"
             htmlFor="c-contact"
             hint={isSidebarLayout ? undefined : 'Shown in themes with a sidebar, like Modern.'}
-            modified={settings.labels?.contact !== undefined}
+            modified={modified.contact}
             onReset={() => onSet(['labels', 'contact'], undefined)}
           >
             <input
@@ -267,7 +265,7 @@ export function CustomizePanel({
         {isSidebarLayout && (
           <Group title="Sidebar">
             <p className="customize-hint">
-              {settings.sidebar
+              {sidebarModified
                 ? 'Chosen sections go in the sidebar.'
                 : 'Now: sections with a skills list (**Label:** items) go in the sidebar automatically.'}
             </p>
@@ -282,7 +280,7 @@ export function CustomizePanel({
                 {heading}
               </label>
             ))}
-            {settings.sidebar && (
+            {sidebarModified && (
               <button type="button" className="customize-link" onClick={() => onSet(['sidebar'], undefined)}>
                 <RotateCcw size={13} aria-hidden="true" />
                 Back to automatic
@@ -292,7 +290,7 @@ export function CustomizePanel({
         )}
 
         <div className="customize-footer">
-          <button type="button" disabled={!anyStyleSet} onClick={onReset}>
+          <button type="button" disabled={!anyModified} onClick={onReset}>
             <RotateCcw size={14} aria-hidden="true" />
             Reset to theme defaults
           </button>
