@@ -1,0 +1,71 @@
+# Resumark i k3s: to kopier av nginx-containeren og en Service foran dem.
+# Bruk: kubectl apply -f k8s/resumark.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resumark
+  labels:
+    app: resumark
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: resumark
+  template:
+    metadata:
+      labels:
+        app: resumark
+    spec:
+      # Spre podene på hver sin node når det går, så appen svarer selv om én node er nede
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: resumark
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: resumark
+          image: ghcr.io/pthormodsen/resumark:latest
+          imagePullPolicy: Always # :latest endrer seg, så hent på nytt ved hver restart
+          ports:
+            - name: http
+              containerPort: 8080
+          # Klar til å få trafikk / fortsatt i live: nginx svarer på /healthz
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 20
+          # nginx med statiske filer bruker svært lite
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resumark
+  labels:
+    app: resumark
+spec:
+  selector:
+    app: resumark
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

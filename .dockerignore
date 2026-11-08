@@ -1,0 +1,10 @@
+# Bare det bygget trenger sendes til Docker. node_modules installeres på nytt i imaget.
+node_modules
+dist
+.git
+.github
+k8s
+*.log
+.DS_Store
+.vscode
+.idea
