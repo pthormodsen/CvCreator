@@ -6,7 +6,6 @@ import { effectiveValues, modifiedFields } from '../cvStyle'
 import { findFont, fontOptions } from '../fonts'
 import { renderMarkdown } from '../markdown'
 import { structureCv } from '../structure'
-import { ThemePicker } from './ThemePicker'
 
 type CustomizePanelProps = {
   markdown: string
@@ -15,7 +14,6 @@ type CustomizePanelProps = {
   yamlOk: boolean // false: YAML-en har syntaksfeil, så panelet kan ikke skrive til den
   onSet: (path: string[], value: unknown) => void // undefined = fjern nøkkelen
   onReset: () => void
-  onThemeChange: (id: string) => void
 }
 
 // Panelet leser og skriver bare front matter. Teksten er sannheten, så editoren og
@@ -27,7 +25,6 @@ export function CustomizePanel({
   yamlOk,
   onSet,
   onReset,
-  onThemeChange,
 }: CustomizePanelProps) {
   const defaults = theme.defaults
   const current = effectiveValues(theme, settings)
@@ -95,10 +92,6 @@ export function CustomizePanel({
       )}
 
       <fieldset disabled={!yamlOk}>
-        <Group title="Theme">
-          <ThemePicker name="customize-theme" themeId={theme.id} onChange={onThemeChange} />
-        </Group>
-
         <Group title="Color and type">
           <Field
             label="Accent color"

@@ -15,7 +15,6 @@ type EditorProps = {
   yamlOk: boolean
   onSetSetting: (path: string[], value: unknown) => void
   onResetSettings: () => void
-  onThemeChange: (id: string) => void
   inactive: boolean // skjult fane på mobil
 }
 
@@ -89,7 +88,6 @@ export function Editor(props: EditorProps) {
             yamlOk={yamlOk}
             onSet={props.onSetSetting}
             onReset={props.onResetSettings}
-            onThemeChange={props.onThemeChange}
           />
         )}
         <MarkdownEditor

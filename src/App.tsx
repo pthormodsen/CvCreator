@@ -87,7 +87,7 @@ export default function App() {
     return untouched || window.confirm(message)
   }
 
-  function handleUpload(text: string) {
+  function handleUpload(text: string, _name: string) {
     if (confirmReplace('Replace your text with the file you opened? What you have written will be lost.')) {
       updateMarkdown(text)
     }
@@ -153,7 +153,6 @@ export default function App() {
           yamlOk={cv.yamlOk}
           onSetSetting={updateSetting}
           onResetSettings={resetSettings}
-          onThemeChange={updateTheme}
           inactive={tab !== 'write'}
         />
         <SplitDivider ratio={split} onChange={setSplit} onCommit={commitSplit} />
