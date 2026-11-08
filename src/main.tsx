@@ -9,9 +9,12 @@ import '@fontsource/geist-mono/600.css'
 import './tokens.css'
 import './index.css'
 import App from './App.tsx'
+import { FeedbackProvider } from './feedback/FeedbackProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <FeedbackProvider>
+      <App />
+    </FeedbackProvider>
   </StrictMode>,
 )

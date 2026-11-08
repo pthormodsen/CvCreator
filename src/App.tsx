@@ -14,6 +14,7 @@ import { renderMarkdown } from './markdown'
 import { unknownSidebarSections } from './structure'
 import defaultCv from './defaultCv.md?raw'
 import { exampleCv } from './example'
+import { useFeedback } from './feedback/context'
 
 // Startteksten. Tidligere lå valgt theme i localStorage. Nå står det i front matter
 // (theme: modern), så det følger med filen. Et gammelt valg flyttes over én gang.
@@ -35,6 +36,7 @@ const initialMarkdown = loadInitialMarkdown()
 export default function App() {
   // All tilstand bor her og sendes ned som props. Ingen state-bibliotek trengs.
   const [markdown, setMarkdown] = useState(initialMarkdown)
+  const { toast, confirm } = useFeedback()
   const [saved, setSaved] = useState(true)
   // Innstillingene leses fra front matter hver gang teksten endres
   const cv = useMemo(() => parseCv(markdown), [markdown])
@@ -73,34 +75,43 @@ export default function App() {
     updateMarkdown(updateFrontMatter(markdown, path, value))
   }
 
+  // Bytt ut hele teksten og vis en melding med «Undo», som setter den gamle teksten tilbake
+  function replaceWithUndo(text: string, message: string) {
+    const previous = markdown
+    updateMarkdown(text)
+    toast({ message, action: { label: 'Undo', onClick: () => updateMarkdown(previous) } })
+  }
+
   // «Reset to theme defaults»: fjern alle utseende-innstillingene i én endring (ett Cmd+Z).
-  // Theme, filnavn og egen CSS beholdes.
+  // Theme, filnavn og egen CSS beholdes. Ingen dialog: det kan angres med Undo i meldingen.
   function resetSettings() {
-    if (!window.confirm('Reset colors, font, sizes, spacing, labels and sidebar to the theme defaults?')) return
     const keys = ['accent', 'font', 'font-size', 'line-height', 'margins', 'section-gap', 'entry-gap', 'labels', 'sidebar']
-    updateMarkdown(keys.reduce((text, key) => updateFrontMatter(text, [key], undefined), markdown))
+    replaceWithUndo(
+      keys.reduce((text, key) => updateFrontMatter(text, [key], undefined), markdown),
+      'Reset to theme defaults',
+    )
   }
 
   // Spør før vi erstatter tekst brukeren har skrevet selv
-  function confirmReplace(message: string): boolean {
+  async function confirmReplace(title: string, message: string): Promise<boolean> {
     const untouched = markdown.trim() === '' || markdown === defaultCv || markdown === exampleCv(theme.id)
-    return untouched || window.confirm(message)
+    return untouched || confirm({ title, message, confirmLabel: 'Replace my text', tone: 'danger' })
   }
 
-  function handleUpload(text: string, _name: string) {
-    if (confirmReplace('Replace your text with the file you opened? What you have written will be lost.')) {
-      updateMarkdown(text)
-    }
+  async function handleUpload(text: string, name: string) {
+    const ok = await confirmReplace(
+      `Open “${name}”?`,
+      'The file replaces the text in the editor. You can undo this right after, or save your current text first with File → Save as .md.',
+    )
+    if (ok) replaceWithUndo(text, `Opened ${name}`)
   }
 
-  function handleReset() {
-    if (
-      confirmReplace(
-        'Replace your text with the example CV? What you have written will be lost. Use “Save as file” first if you want to keep it.',
-      )
-    ) {
-      updateMarkdown(exampleCv(theme.id))
-    }
+  async function handleReset() {
+    const ok = await confirmReplace(
+      'Replace your CV with the example?',
+      'The example replaces the text in the editor. You can undo this right after, or save your current text first with File → Save as .md.',
+    )
+    if (ok) replaceWithUndo(exampleCv(theme.id), 'Replaced with the example CV')
   }
 
   // Filnavn: filename i front matter, ellers «CV - Navn» fra første #-linje
@@ -128,6 +139,7 @@ export default function App() {
         onUpload={handleUpload}
         onReset={handleReset}
         onPrint={handlePrint}
+        onSaved={(name) => toast({ message: `Saved ${name}` })}
       />
       {/* Faner, bare synlige på smal skjerm (se .tabs i index.css) */}
       <nav className="tabs">
