@@ -6,7 +6,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+# Full adresse til og:image-lenkene (se vite.config.ts). Settes av workflowen.
+ARG SITE_URL=""
+RUN SITE_URL="$SITE_URL" npm run build
 
 # Steg 2: server filene med nginx. Node og node_modules blir ikke med hit.
 # nginx-unprivileged kjører som en vanlig bruker (ikke root) og lytter på 8080.
