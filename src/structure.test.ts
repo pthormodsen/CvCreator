@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { renderMarkdown } from './markdown'
-import { structureCv, type Layout } from './structure'
+import { structureCv, unknownSidebarSections, type Layout } from './structure'
 import { parseCv } from './settings'
 import defaultCv from './defaultCv.md?raw'
 // Samme CV skrevet på to måter: vanlig markdown og Pandoc-syntaks
@@ -249,5 +249,17 @@ describe('eksempelteksten (defaultCv.md)', () => {
     expect(s.asides.length).toBeGreaterThan(0)
     expect(s.stacks.length).toBeGreaterThan(0)
     expect(s.terms.length).toBeGreaterThan(0)
+  })
+})
+
+describe('unknownSidebarSections', () => {
+  const html = renderMarkdown('# Ola\n\n## Skills\n\n- **A:** b\n\n## Languages\n\n### Not a section\n')
+
+  it('finner navn som ikke er en ##-overskrift', () => {
+    expect(unknownSidebarSections(html, ['Skills', 'Skils', 'Not a section'])).toEqual(['Skils', 'Not a section'])
+  })
+
+  it('godtar forskjell i store og små bokstaver og mellomrom, som selve plasseringen gjør', () => {
+    expect(unknownSidebarSections(html, [' skills', 'LANGUAGES'])).toEqual([])
   })
 })

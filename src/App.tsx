@@ -10,6 +10,8 @@ import { load, remove, save } from './storage'
 import { parseCv, updateFrontMatter } from './settings'
 import { effectiveValues } from './cvStyle'
 import { fontsReadyFor } from './fonts'
+import { renderMarkdown } from './markdown'
+import { unknownSidebarSections } from './structure'
 import defaultCv from './defaultCv.md?raw'
 import { exampleCv } from './example'
 
@@ -37,6 +39,13 @@ export default function App() {
   // Innstillingene leses fra front matter hver gang teksten endres
   const cv = useMemo(() => parseCv(markdown), [markdown])
   const theme = findTheme(cv.settings.theme ?? 'classic')
+  // Advarsler: ugyldige verdier (fra parseCv) og navn i sidebar: som ikke finnes som ## i CV-en
+  const warnings = useMemo(() => {
+    const sidebar = cv.settings.sidebar
+    if (!sidebar?.length) return cv.warnings
+    const missing = unknownSidebarSections(renderMarkdown(markdown), sidebar)
+    return [...cv.warnings, ...missing.map((name) => `sidebar: there is no ## section called "${name}".`)]
+  }, [cv, markdown])
   // Hvilken fane som vises på smal skjerm. På bred skjerm vises begge panelene.
   const [tab, setTab] = useState<'write' | 'preview'>('write')
   // Hvor stor andel av bredden editoren får (0.4 = 40 %). Lagres når brukeren slipper skillelinjen.
@@ -138,7 +147,7 @@ export default function App() {
           onChange={updateMarkdown}
           settings={cv.settings}
           theme={theme}
-          warnings={cv.warnings}
+          warnings={warnings}
           yamlOk={cv.yamlOk}
           onSetSetting={updateSetting}
           onResetSettings={resetSettings}

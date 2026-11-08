@@ -71,6 +71,14 @@ function belongsInSidebar(section: HTMLElement, chosen?: string[]): boolean {
   return chosen.some((name) => name.trim().toLowerCase() === heading)
 }
 
+// Navn i sidebar: som ikke finnes som ##-overskrift (typisk en skrivefeil).
+// Sammenlignes på samme måte som belongsInSidebar.
+export function unknownSidebarSections(html: string, chosen: string[]): string[] {
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const headings = [...doc.querySelectorAll('h2')].map((h) => h.textContent!.trim().toLowerCase())
+  return chosen.filter((name) => !headings.includes(name.trim().toLowerCase()))
+}
+
 function createEl(doc: Document, tag: string, className: string): HTMLElement {
   const el = doc.createElement(tag)
   el.className = className
