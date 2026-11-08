@@ -1,11 +1,14 @@
-import { useMemo, useState, type ReactNode } from 'react'
-import { RotateCcw, TriangleAlert } from 'lucide-react'
+import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { ChevronRight, RotateCcw, TriangleAlert } from 'lucide-react'
+import { parseDocument } from 'yaml'
 import type { Settings } from '../settings'
 import type { Theme } from '../themes'
 import { effectiveValues, modifiedFields } from '../cvStyle'
 import { findFont, fontOptions } from '../fonts'
 import { renderMarkdown } from '../markdown'
 import { structureCv } from '../structure'
+import { splitFrontMatter } from '../settings'
+import { load, save } from '../storage'
 
 type CustomizePanelProps = {
   markdown: string
@@ -79,7 +82,53 @@ export function CustomizePanel({
     settings.sidebar !== undefined &&
     (sections.inSidebar.length !== sections.automatic.length ||
       sections.inSidebar.some((h) => !sections.automatic.includes(h)))
-  const anyModified = Object.values(modified).some(Boolean) || sidebarModified
+
+  // Egen CSS og filnavn står rått i front matter (settings.css er allerede renset og pakket inn)
+  const raw = useMemo(() => rawFrontMatter(markdown), [markdown])
+  const [cssDraft, setCssDraft] = useState(raw.css)
+  const [lastRawCss, setLastRawCss] = useState(raw.css)
+  // Endret utenfra (i editoren, Undo): ta inn den nye teksten. Ellers beholdes utkastet,
+  // så markøren ikke hopper når YAML-en fjerner mellomrom på slutten.
+  if (raw.css !== lastRawCss) {
+    setLastRawCss(raw.css)
+    if (raw.css.trimEnd() !== cssDraft.trimEnd()) setCssDraft(raw.css)
+  }
+  const defaultFilename = (() => {
+    const name = splitFrontMatter(markdown).body.match(/^#\s+(.+)$/m)?.[1].trim()
+    return name ? `CV - ${name}` : 'CV'
+  })()
+
+  // Hvor mange endringer hver seksjon har (vises som «2 changed»)
+  const counts = {
+    type: [modified.accent, modified.font, modified.fontSize, modified.lineHeight].filter(Boolean).length,
+    spacing: [modified.margins, modified.sectionGap, modified.entryGap].filter(Boolean).length,
+    layout: sidebarModified ? 1 : 0,
+    labels: modified.contact ? 1 : 0,
+    advanced: [raw.css.trim() !== '', settings.filename !== undefined].filter(Boolean).length,
+  }
+  const resettable = counts.type + counts.spacing + counts.layout + counts.labels
+
+  // Hvilke seksjoner som er åpne huskes i nettleseren
+  const [openSections, setOpenSections] = useState<string[]>(() => {
+    try {
+      const saved = JSON.parse(load('customize-open', '["type"]'))
+      return Array.isArray(saved) ? saved : ['type']
+    } catch {
+      return ['type']
+    }
+  })
+  function toggleSection(id: string) {
+    const next = openSections.includes(id) ? openSections.filter((s) => s !== id) : [...openSections, id]
+    setOpenSections(next)
+    save('customize-open', JSON.stringify(next))
+  }
+  const section = (id: keyof typeof counts, title: string) => ({
+    id,
+    title,
+    changed: counts[id],
+    open: openSections.includes(id),
+    onToggle: () => toggleSection(id),
+  })
 
   return (
     <div className="customize">
@@ -92,7 +141,7 @@ export function CustomizePanel({
       )}
 
       <fieldset disabled={!yamlOk}>
-        <Group title="Color and type">
+        <Section {...section('type', 'Type and color')}>
           <Field
             label="Accent color"
             htmlFor="c-accent"
@@ -181,9 +230,9 @@ export function CustomizePanel({
             onChange={(v) => setNumber(['line-height'], v, defaults.lineHeight, 0.05)}
             onReset={() => onSet(['line-height'], undefined)}
           />
-        </Group>
+        </Section>
 
-        <Group title="Spacing">
+        <Section {...section('spacing', 'Spacing')}>
           <Slider
             label="Margins top and bottom"
             id="c-margin-y"
@@ -232,9 +281,45 @@ export function CustomizePanel({
             onChange={(v) => setNumber(['entry-gap'], v, defaults.entryGap, 0.5, 'mm')}
             onReset={() => onSet(['entry-gap'], undefined)}
           />
-        </Group>
+        </Section>
 
-        <Group title="Labels">
+        <Section {...section('layout', 'Layout')}>
+          {isSidebarLayout ? (
+            <>
+              <p className="customize-hint">
+                {sidebarModified
+                  ? 'These sections go in the sidebar:'
+                  : 'Sections with a skills list (**Label:** items) go in the sidebar automatically. Pick your own:'}
+              </p>
+              {sections.all.length === 0 && (
+                <p className="customize-hint">Add ## sections to your CV to choose them here.</p>
+              )}
+              {sections.all.map((heading) => (
+                <label key={heading} className="customize-check">
+                  <input
+                    type="checkbox"
+                    checked={sections.inSidebar.includes(heading)}
+                    onChange={(e) => toggleSidebar(heading, e.target.checked)}
+                  />
+                  {heading}
+                </label>
+              ))}
+              {sidebarModified && (
+                <button type="button" className="link-button" onClick={() => onSet(['sidebar'], undefined)}>
+                  <RotateCcw size={13} aria-hidden="true" />
+                  Back to automatic
+                </button>
+              )}
+            </>
+          ) : (
+            <p className="customize-hint">
+              {theme.name} uses a single column. Choose Modern in the toolbar to get a sidebar for contact
+              details and skills.
+            </p>
+          )}
+        </Section>
+
+        <Section {...section('labels', 'Labels')}>
           <Field
             label="Contact heading"
             htmlFor="c-contact"
@@ -253,57 +338,84 @@ export function CustomizePanel({
               }}
             />
           </Field>
-        </Group>
+        </Section>
 
-        {isSidebarLayout && (
-          <Group title="Sidebar">
-            <p className="customize-hint">
-              {sidebarModified
-                ? 'Chosen sections go in the sidebar.'
-                : 'Now: sections with a skills list (**Label:** items) go in the sidebar automatically.'}
-            </p>
-            {sections.all.length === 0 && <p className="customize-hint">Add ## sections to your CV to choose them here.</p>}
-            {sections.all.map((heading) => (
-              <label key={heading} className="customize-check">
-                <input
-                  type="checkbox"
-                  checked={sections.inSidebar.includes(heading)}
-                  onChange={(e) => toggleSidebar(heading, e.target.checked)}
-                />
-                {heading}
-              </label>
-            ))}
-            {sidebarModified && (
-              <button type="button" className="customize-link" onClick={() => onSet(['sidebar'], undefined)}>
-                <RotateCcw size={13} aria-hidden="true" />
-                Back to automatic
-              </button>
-            )}
-          </Group>
-        )}
+        <Section {...section('advanced', 'Advanced')}>
+          <Field label="File name" htmlFor="c-filename" hint="Used for the PDF and the .md file.">
+            <input
+              id="c-filename"
+              type="text"
+              placeholder={defaultFilename}
+              value={raw.filename}
+              onChange={(e) => onSet(['filename'], e.target.value.trim() ? e.target.value : undefined)}
+            />
+          </Field>
+          <label className="customize-label-block" htmlFor="c-css">
+            Your own CSS
+          </label>
+          <textarea
+            id="c-css"
+            spellCheck={false}
+            placeholder={'.header h1 { letter-spacing: 0 }\nh2 { text-transform: none }'}
+            value={cssDraft}
+            onChange={(e) => {
+              setCssDraft(e.target.value)
+              onSet(['css'], e.target.value.trim() ? e.target.value : undefined)
+            }}
+          />
+          <p className="customize-hint customize-hint-after">
+            Applies only to the CV sheet. Links to outside files are not allowed. Not affected by Reset.
+          </p>
+        </Section>
+      </fieldset>
 
+      {resettable > 0 ? (
         <div className="customize-footer">
-          <button type="button" disabled={!anyModified} onClick={onReset}>
+          <span>
+            {resettable} {resettable === 1 ? 'change' : 'changes'} from {theme.name}
+          </span>
+          <button type="button" className="btn btn-secondary btn-sm" disabled={!yamlOk} onClick={onReset}>
             <RotateCcw size={14} aria-hidden="true" />
             Reset to theme defaults
           </button>
-          <p className="customize-hint">
-            Everything here is saved as settings at the top of your Markdown (front matter), so it travels
-            with the file. File name and your own CSS can be set there too. See Syntax.
-          </p>
         </div>
-      </fieldset>
+      ) : (
+        <p className="customize-note">
+          Everything here is saved as settings at the top of your Markdown, so it travels with the file.
+        </p>
+      )}
     </div>
   )
 }
 
 // ---------- Små byggeklosser ----------
 
-function Group({ title, children }: { title: string; children: ReactNode }) {
+type SectionProps = {
+  id: string
+  title: string
+  changed: number
+  open: boolean
+  onToggle: () => void
+  children: ReactNode
+}
+
+// Sammenleggbar seksjon. Innholdet blir i DOM-en (skjult), så høyden kan animeres.
+function Section({ id, title, changed, open, onToggle, children }: SectionProps) {
+  const bodyId = `cz-${id}`
   return (
-    <section className="customize-group">
-      <h3>{title}</h3>
-      {children}
+    <section className="cz-section">
+      <h3>
+        <button type="button" className="cz-header" aria-expanded={open} aria-controls={bodyId} onClick={onToggle}>
+          <ChevronRight size={16} className="cz-chevron" aria-hidden="true" />
+          <span className="cz-title">{title}</span>
+          {changed > 0 && <span className="cz-changed">{changed} changed</span>}
+        </button>
+      </h3>
+      <div className="cz-body" id={bodyId} data-open={open} inert={!open}>
+        <div className="cz-body-inner">
+          <div className="cz-content">{children}</div>
+        </div>
+      </div>
     </section>
   )
 }
@@ -326,7 +438,7 @@ function Field({ label, htmlFor, children, value, hint, modified, onReset }: Fie
         {children}
         {value && <span className="customize-value">{value}</span>}
         {modified && onReset && (
-          <button type="button" className="customize-reset" title={`Reset ${label.toLowerCase()}`} onClick={onReset}>
+          <button type="button" className="icon-button customize-reset" title={`Reset ${label.toLowerCase()}`} onClick={onReset}>
             <RotateCcw size={13} aria-hidden="true" />
             <span className="visually-hidden">Reset {label.toLowerCase()}</span>
           </button>
@@ -362,6 +474,8 @@ function Slider({ label, id, value, min, max, step, unit, modified, onChange, on
     >
       <input
         id={id}
+        // Fylt del av sporet (Chrome/Safari har ingen egen stil for den)
+        style={{ '--fill': `${((value - min) / (max - min)) * 100}%` } as CSSProperties}
         type="range"
         min={min}
         max={max}
@@ -384,4 +498,17 @@ function toHex(color: string): string {
 // Unngå 9.250000001 i front matter
 function round(value: number): number {
   return Math.round(value * 100) / 100
+}
+
+// css og filename slik de står skrevet i front matter (tom tekst hvis de mangler eller YAML-en er ugyldig)
+function rawFrontMatter(markdown: string): { css: string; filename: string } {
+  const { frontMatter } = splitFrontMatter(markdown)
+  if (!frontMatter?.trim()) return { css: '', filename: '' }
+  const doc = parseDocument(frontMatter)
+  if (doc.errors.length > 0) return { css: '', filename: '' }
+  const text = (key: string) => {
+    const value = doc.get(key)
+    return value === null || value === undefined ? '' : String(value)
+  }
+  return { css: text('css'), filename: text('filename') }
 }
