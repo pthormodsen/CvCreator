@@ -3,6 +3,8 @@ import { Eye, Pencil } from 'lucide-react'
 import { Editor } from './components/Editor'
 import { Preview } from './components/Preview'
 import { Toolbar } from './components/Toolbar'
+import { Footer } from './components/Footer'
+import { Welcome } from './components/Welcome'
 import { SplitDivider } from './components/SplitDivider'
 import { clampSplit, DEFAULT_SPLIT } from './split'
 import { findTheme } from './themes'
@@ -170,6 +172,8 @@ export default function App() {
         <SplitDivider ratio={split} onChange={setSplit} onCommit={commitSplit} />
         <Preview markdown={markdown} settings={cv.settings} theme={theme} inactive={tab !== 'preview'} />
       </main>
+      <Footer />
+      <Welcome />
     </div>
   )
 }

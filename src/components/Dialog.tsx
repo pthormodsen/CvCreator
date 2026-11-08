@@ -20,7 +20,11 @@ export function Dialog({ open, onClose, title, children, actions, size = 'sm', c
   useEffect(() => {
     const dialog = ref.current
     if (!dialog) return
-    if (open && !dialog.open) dialog.showModal()
+    if (open && !dialog.open) {
+      dialog.showModal()
+      // showModal() gir fokus til første knapp (lukkekrysset). Hovedknappen er et bedre valg.
+      dialog.querySelector<HTMLElement>('[data-autofocus]')?.focus()
+    }
     if (!open && dialog.open) dialog.close()
   }, [open])
 

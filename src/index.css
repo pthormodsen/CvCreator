@@ -53,6 +53,7 @@ a { color: var(--color-accent-text); }
 }
 .btn:active:not(:disabled) { transform: translateY(0.5px) scale(0.985); }
 .btn:disabled { opacity: 0.45; cursor: default; }
+a.btn { text-decoration: none; color: var(--color-text); }
 .btn svg { flex-shrink: 0; }
 
 .btn-primary {
@@ -773,6 +774,7 @@ a { color: var(--color-accent-text); }
 
 /* Velkomst og About */
 .welcome-hero { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
+.welcome-hero p { margin: 0; color: var(--color-text); font-weight: var(--weight-medium); }
 .welcome-hero .brand-mark { width: 40px; height: 40px; }
 .welcome-steps { list-style: none; margin: 0 0 var(--space-4); padding: 0; display: grid; gap: var(--space-3); }
 .welcome-steps li { display: grid; grid-template-columns: 32px 1fr; gap: var(--space-3); align-items: start; }
@@ -838,7 +840,7 @@ a { color: var(--color-accent-text); }
 
 @media screen and (max-width: 420px) {
   .brand-name { display: none; }
-  .app-footer-links a span { display: none; }
+  .app-footer-links svg { display: none; }
 }
 
 /* ================================================================

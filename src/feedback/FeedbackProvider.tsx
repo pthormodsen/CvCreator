@@ -55,7 +55,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 className={pending.tone === 'danger' ? 'btn btn-danger' : 'btn btn-primary'}
-                autoFocus
+                data-autofocus
                 onClick={() => answer(true)}
               >
                 {pending.confirmLabel}
