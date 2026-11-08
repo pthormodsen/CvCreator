@@ -44,3 +44,36 @@ describe('HTML blir renset (DOMPurify)', () => {
     expect(cv.querySelector('a')?.getAttribute('href')).toBe('https://example.com')
   })
 })
+
+describe('eksterne bilder blokkeres, data:-bilder er lov', () => {
+  const PIXEL = 'data:image/png;base64,iVBORw0KGgo='
+
+  it('fjerner src på bilder fra nettet (markdown og HTML)', () => {
+    expect(render('![Logo](https://evil.example/x.png)').querySelector('img')?.hasAttribute('src')).toBe(false)
+    expect(render('<img src="//evil.example/x.png">').querySelector('img')?.hasAttribute('src')).toBe(false)
+    expect(renderMarkdown('<img src="x.png" srcset="https://evil.example/x.png 2x">')).not.toContain('evil')
+  })
+
+  it('beholder data:image-bilder', () => {
+    expect(render(`![Logo](${PIXEL})`).querySelector('img')?.getAttribute('src')).toBe(PIXEL)
+  })
+
+  it('fjerner url() fra nettet i style-attributter, men beholder data:', () => {
+    expect(renderMarkdown('<div style="color: red; background: url(https://evil.example/x.png)">x</div>')).not.toContain('evil')
+    expect(render('<div style="color: red; background: url(https://evil.example/x.png)">x</div>').querySelector('div')?.getAttribute('style')).toContain('color: red')
+    expect(render(`<div style="background: url('${PIXEL}')">x</div>`).querySelector('div')?.getAttribute('style')).toContain(PIXEL)
+  })
+
+  it('fjerner style med triks som kan skjule url(', () => {
+    for (const style of ['background: \\75rl(https://evil.example/x)', 'background: url(https://evil.example/x', 'background: image-set("https://evil.example/x" 1x)']) {
+      expect(renderMarkdown(`<div style='${style}'>x</div>`)).not.toContain('evil')
+    }
+  })
+
+  it('fjerner SVG, video og andre tagger som kan laste fra nettet', () => {
+    const html = renderMarkdown(
+      '<svg><image href="https://evil.example/a.png"/></svg><video poster="https://evil.example/b.png"></video><audio src="https://evil.example/c.mp3"></audio><table background="https://evil.example/d.png"><tr><td>x</td></tr></table>',
+    )
+    expect(html).not.toContain('evil')
+  })
+})
