@@ -41,7 +41,7 @@ describe('vanlig markdown og Pandoc gir samme struktur', () => {
 
     expect(plain).toEqual(pandoc)
     // Sjekk at oppsummeringen faktisk inneholder noe, så testen ikke passerer på to tomme
-    expect(plain.name).toEqual(['Patrik Thormodsen'])
+    expect(plain.name).toEqual(['Kari Nordmann'])
     expect(plain.contactLinks).toHaveLength(5)
     expect(plain.asides.length).toBeGreaterThan(5)
     expect(plain.stacks).toHaveLength(5)

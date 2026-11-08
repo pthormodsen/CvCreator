@@ -1,14 +1,14 @@
-# Patrik Thormodsen
+# Kari Nordmann
 
-Dataingeniørstudent · Fullstackutvikling og IT-infrastruktur
+Dataingeniørstudent · Fullstackutvikling og drift
 
-[+47 904 71 841](tel:+4790471841) · [patrik.thormodsen@gmail.com](mailto:patrik.thormodsen@gmail.com)\
-[portfolio.patreek.no](https://portfolio.patreek.no) · [github.com/pthormodsen](https://github.com/pthormodsen)\
-[linkedin.com/in/pthormodsen](https://www.linkedin.com/in/pthormodsen)
+[+47 123 45 678](tel:+4712345678) · [kari.nordmann@example.com](mailto:kari.nordmann@example.com)\
+[karinordmann.example.com](https://karinordmann.example.com) · [github.com/kari-nordmann](https://github.com/kari-nordmann)\
+[linkedin.com/in/kari-nordmann](https://www.linkedin.com/in/kari-nordmann)
 
 ## Profil
 
-Dataingeniørstudent ved Høgskulen på Vestlandet med erfaring fra både frontend og backend, mest med Java, Spring Boot, React, TypeScript og PostgreSQL. Utvikler bookingsystemet til Velferdstinget Vest gjennom Fribyte. Drifter i tillegg egen serverinfrastruktur med Proxmox, Linux, Docker og k3s, der prosjektene mine kjører.
+Dataingeniørstudent ved Fjordvik høgskole med erfaring fra både frontend og backend, mest med Java, Spring Boot, React, TypeScript og PostgreSQL. Utvikler et reservasjonssystem for studentforeningen Kodeklubben. Drifter i tillegg en liten hjemmeserver med Linux, Docker og k3s, der prosjektene mine kjører.
 
 ## Teknisk kompetanse
 
@@ -16,109 +16,109 @@ Dataingeniørstudent ved Høgskulen på Vestlandet med erfaring fra både fronte
 - **Backend:** Spring Boot, Spring Security, REST API, FastAPI
 - **Frontend:** React, Vite, Tailwind CSS, HTML og CSS
 - **Databaser:** PostgreSQL, Flyway, datamodellering
-- **Infrastruktur:** Linux, Proxmox, Docker og Docker Compose, k3s (Kubernetes), Nginx, Cloudflare Tunnel
+- **Infrastruktur:** Linux, Docker og Docker Compose, k3s (Kubernetes), Nginx
 - **CI/CD og verktøy:** Git, GitHub Actions, GitHub Container Registry (GHCR)
 - **Maskinlæring:** scikit-learn, pandas, Jupyter
 
 ## Utvalgte prosjekter
 
-### VT Booking for Velferdstinget Vest | Gjennom Fribyte
+### Romreservasjon for Kodeklubben | Frivillig prosjekt
 
 *React · TypeScript · Spring Boot · Spring Security · PostgreSQL · Flyway · Docker*
 
-Bookingsystem for møterom og lokaler hos Velferdstinget Vest. Jeg utvikler både frontend og backend. Systemet kjører i et testmiljø og skal snart tas i bruk av organisasjonene.
+Reservasjonssystem for grupperom og utstyr i studentforeningen Kodeklubben. Jeg utvikler både frontend og backend. Systemet kjører i et testmiljø og skal snart tas i bruk av medlemmene.
 
-- REST API med innlogging, to administratorroller og tilgang per organisasjon og rom: direkte booking, søknad eller ingen tilgang
-- Søknader som administrator godkjenner, gjentakende bookinger og regler som hindrer dobbeltbooking
+- REST API med innlogging, to administratorroller og tilgang per gruppe og rom: direkte reservasjon, søknad eller ingen tilgang
+- Søknader som administrator godkjenner, gjentakende reservasjoner og regler som hindrer dobbeltbooking
 - Kalender i React med dag-, uke- og månedsvisning
 - Skjemaet versjoneres med Flyway. Images bygges i GitHub Actions og kjøres med Docker Compose bak Nginx
 
-### Homelab og serverinfrastruktur
+### Hjemmeserver og drift
 
-*Proxmox · Linux · Docker · k3s · GitHub Actions · GHCR · Cloudflare Tunnel*
+*Linux · Docker · k3s · GitHub Actions · GHCR*
 
-Proxmox-klynge på tre fysiske maskiner, der to står på hele tiden. Her kjører prosjektene mine, testmiljøet til VT Booking og noen apper for andre.
+Liten klynge på to brukte stasjonære maskiner. Her kjører prosjektene mine, testmiljøet til romreservasjonen og noen apper for venner.
 
-- Flytter tjenestene fra én Docker-host til en k3s-klynge med to noder på hver sin maskin. Åtte av ti apper er flyttet
+- Flytter tjenestene fra én Docker-host til en k3s-klynge med to noder på hver sin maskin. Seks av ni apper er flyttet
 - Hver app kjører med én pod per node, så den fortsatt svarer hvis én maskin går ned
-- Images bygges i GitHub Actions og publiseres til GHCR. Ekstern tilgang går gjennom Cloudflare Tunnel
+- Images bygges i GitHub Actions og publiseres til GHCR
 - Setter opp VM-er fra maler, med faste IP-adresser og daglig backup til den andre maskinen
 
-### Chess | [Live](https://chess.patreek.no) · [GitHub](https://github.com/pthormodsen/Chess)
+### Ordspill | [Live](https://ordspill.example.com) · [GitHub](https://github.com/kari-nordmann/ordspill)
 
-*Java · Spring Boot · React · Stockfish*
+*Java · Spring Boot · React*
 
-Sjakk i nettleseren, med spillogikken skrevet i Java. Du kan spille mot en annen person eller mot Stockfish med valgfri Elo, og analysere egne eller importerte partier (PGN) med beste trekk, trekkvurdering og evalueringsgraf.
+Ordspill i nettleseren, med spillogikken skrevet i Java. Du kan spille mot en annen person eller mot datamaskinen på tre nivåer, og se statistikk over tidligere spill med beste trekk og poengutvikling.
 
-### Phishing URL Detector | [Live](https://phishing.patreek.no) · [GitHub](https://github.com/pthormodsen/PhishingURL)
+### Spamfilter for e-post | [Live](https://spamfilter.example.com) · [GitHub](https://github.com/kari-nordmann/spamfilter)
 
 *Python · scikit-learn · FastAPI · React · TypeScript*
 
-Skoleprosjekt i DAT158 Maskinlæring. Jeg laget en nettside der du limer inn en URL og får vite om modellen mener den er phishing. Modellen ser bare på selve URL-teksten og besøker aldri siden.
+Skoleprosjekt i maskinlæring. Jeg laget en nettside der du limer inn en e-posttekst og får vite om modellen mener den er spam. Modellen ser bare på teksten og åpner aldri lenker.
 
-- Utviklet modellen, FastAPI-backend og React-frontend, og drifter den i k3s-klyngen min
-- Logistisk regresjon på TF-IDF av tegn-n-gram, trent på 24 000 URL-er
-- På 10 000 test-URL-er holdt utenfor treningen: 90,6 % accuracy, 97,7 % presisjon og 80,8 % recall. 1,5 % av de legitime URL-ene ble feilaktig flagget
+- Utviklet modellen, FastAPI-backend og React-frontend, og drifter den på hjemmeserveren min
+- Logistisk regresjon på TF-IDF av ord og tegn-n-gram, trent på 20 000 e-poster
+- På 5 000 test-e-poster holdt utenfor treningen: 95,1 % accuracy, 96,4 % presisjon og 91,2 % recall. 2,0 % av de vanlige e-postene ble feilaktig flagget
 
-### SeatSense | [Live](https://seatsense.patreek.no) · [GitHub](https://github.com/pthormodsen/SeatSense)
+### Plassfinner | [Live](https://plassfinner.example.com) · [GitHub](https://github.com/kari-nordmann/plassfinner)
 
-*ESP32-S3 · mmWave-sensor (HLK-LD2410C) · React · TypeScript · MazeMap*
+*ESP32 · Bevegelsessensor · React · TypeScript · Leaflet*
 
-Prototype som viser ledige leseplasser på campus, laget som gruppeprosjekt. En mmWave-sensor på en ESP32-S3 registrerer om plassen er i bruk, og nettsiden viser status på et MazeMap-kart. Kartet bruker foreløpig mockdata.
+Prototype som viser ledige lesesalsplasser, laget som gruppeprosjekt. En bevegelsessensor på en ESP32 registrerer om plassen er i bruk, og nettsiden viser status på et kart. Kartet bruker foreløpig testdata.
 
 - Jeg hadde hovedansvaret for den fysiske prototypen og nettsiden
 
 ## Arbeidserfaring
 
-### Studentassistent, Høgskulen på Vestlandet | jan. 2026 – nå · Bergen
+### Studentassistent, Fjordvik høgskole | jan. 2026 – nå · Fjordvik
 
-- Veileder studenter i DAT107 Databaser, MAT210 Videregående diskret matematikk og FOR033 Matematikk forkurs
+- Veileder studenter i databaser, diskret matematikk og forkurs i matematikk
 - Retter og vurderer innleveringer
 
-### Teknisk eksamensvakt, Høgskulen på Vestlandet | des. 2025 – nå · Bergen
+### Eksamensvakt, Fjordvik høgskole | des. 2025 – nå · Fjordvik
 
-- Teknisk støtte til studenter under digital eksamen, blant annet i WISEflow, ofte i flere rom samtidig
+- Teknisk støtte til studenter under digital eksamen, ofte i flere rom samtidig
 
-### Lagermedarbeider / ringehjelp, TINE Supply Chain | jun. 2022 – nå · Sola og Bergen
+### Lagermedarbeider, Nordlys Distribusjon AS | jun. 2022 – nå · Strandby og Fjordvik
 
 Fast ansatt i perioder. Jobber nå ved siden av studiene og i ferier.
 
-- Plukk og pakking med stemmestyrt plukking (Pick By Voice), truckkjøring, varemottak og påfylling
-- Håndterer tredjepartsvarer, som krever nøyaktighet og mye kontakt med de andre involverte
-- Hadde ansvaret for Lervig-distribusjonen i en sommerjobb
+- Plukk og pakking med stemmestyrt plukking, truckkjøring, varemottak og påfylling
+- Håndterer varer fra andre leverandører, som krever nøyaktighet og mye kontakt med de andre involverte
+- Hadde ansvaret for én kundes distribusjon i en sommerjobb
 
-### Terminalsoldat, Forsvaret | apr. 2023 – apr. 2024 · Gardermoen
+### Lagerarbeider, Fjelltopp Logistikk | apr. 2023 – apr. 2024 · Strandby
 
-- Lasting og lossing av militære fly, med strenge krav til sikkerhet og presisjon
+- Lasting og lossing av varer, med strenge krav til sikkerhet og presisjon
 
 ### Tidligere arbeidserfaring
 
-- Butikkmedarbeider, REMA 1000 Hove, Sandnes (2021–2022)
-- Medarbeider, McDonald's, Sandnes (2020–2021)
+- Butikkmedarbeider, Dagligvare Sentrum, Strandby (2021–2022)
+- Medarbeider, Kafé Hjørnet, Strandby (2020–2021)
 
 ## Utdanning
 
-### Bachelor i dataingeniør, Høgskulen på Vestlandet | aug. 2024 – jun. 2027 (forventet)
+### Bachelor i dataingeniør, Fjordvik høgskole | aug. 2024 – jun. 2027 (forventet)
 
-Fordypning i programvareutvikling og arkitektur. Relevante emner: DAT107 Databaser, DAT108 Programmering og webapplikasjoner, DAT110 Distribuerte systemer og nettverksteknologi, DAT158 Maskinlæring.
+Fordypning i programvareutvikling og arkitektur. Relevante emner: databaser, programmering og webapplikasjoner, distribuerte systemer og nettverksteknologi, maskinlæring.
 
-### Studiespesialisering, Bryne og Sandnes vidaregåande skule | aug. 2019 – jun. 2022
+### Studiespesialisering, Strandby videregående skole | aug. 2019 – jun. 2022
 
 ## Verv og frivillig arbeid
 
-### Nestleder, Fribyte | aug. 2025 – jan. 2026
+### Nestleder, Kodeklubben | aug. 2025 – jan. 2026
 
-Medlem siden aug. 2024. Fribyte drifter IT-tjenester for studentorganisasjoner i Bergen.
+Medlem siden aug. 2024. Kodeklubben lager IT-løsninger for studentforeninger i Fjordvik.
 
 - Ansvar for administrativt arbeid, kontrakter og oppfølging
 
-### Sekretær, Root | aug. 2024 – feb. 2026
+### Sekretær, Linjeforeningen Bit | aug. 2024 – feb. 2026
 
-Linjeforeningen for dataingeniør og informasjonsteknologi ved HVL.
+Linjeforeningen for dataingeniør og informasjonsteknologi ved Fjordvik høgskole.
 
-- Del av ledelsen sammen med leder og nestleder. Skrev møtereferater og var med på å ta beslutninger
+- Del av styret sammen med leder og nestleder. Skrev møtereferater og var med på å ta beslutninger
 
-### Frivillig, Cloud Native Bergen | okt. 2026
+### Frivillig, Fjordvik Tech Meetup | okt. 2026
 
 - Praktisk gjennomføring og logistikk under konferansen
 
